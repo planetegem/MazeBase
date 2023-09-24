@@ -1,6 +1,14 @@
-function start(clickedElement: any, mazeType: MazeClassConstructor | MazeConstructor, speed: number, width: number, height: number): void {
+
+// Function to start animating maze: creates new maze object and animates it on canvas click
+function start(
+    clickedElement: any, // element is clicked to start function
+    mazeType: MazeClassConstructor | MazeConstructor, // Select constructor: MazeClassConstructor = old interface
+    speed: number, // Determines number of ticks between each animation step
+    width: number, // Maze width
+    height: number // Maze height
+): void {
     if (!clickedElement.classList.contains("running")){
-        clickedElement.classList.add("running");
+        clickedElement.classList.add("running"); // Blocks double execution
         clickedElement.getElementsByClassName("overlay")[0].classList.remove("clickable");
         clickedElement.getElementsByClassName("overlay")[0].classList.remove("clicked");
 
@@ -31,6 +39,8 @@ function start(clickedElement: any, mazeType: MazeClassConstructor | MazeConstru
         window.requestAnimationFrame(animate);
     }
 }
+
+// Function to draw play button on canvas (on page load)
 function drawOverlay(canvas: HTMLCanvasElement, color: string): void {
     let ctx: CanvasRenderingContext2D | null = canvas.getContext("2d"),
         height: number = canvas.height*0.2,
@@ -56,25 +66,29 @@ function drawOverlay(canvas: HTMLCanvasElement, color: string): void {
     }
 }
 
+// Prepare page on load
 window.addEventListener("load", ():void => {
-    // PRELOAD IMAGES & CREATE MAZE CANVAS ELEMENTS
+    // 1. Preload images
     let containers = document.getElementsByClassName("canvas-container"),
         loader: number = 0;
 
     for (let container of containers){
+        // 1a. Retrieve background-image from css
         let url: string = window.getComputedStyle(container).backgroundImage;
         url = url.split("assets/")[1];
-        url = (url) ? "assets/" + url.substring(0, url.length - 2) : "assets/cat.png";
+        url = (url) ? "assets/" + url.substring(0, url.length - 2) : "assets/cat.png"; // If no background image in css, default to cat
 
         let imgPreload: HTMLImageElement = document.createElement("img");
         
         imgPreload.onload = ():void => {
+            // 2a. Once image is loaded, create canvas elements: first the canvas where the maze will be drawn
             let canvas = document.createElement("canvas");
             canvas.classList.add("maze");
             container.appendChild(canvas);
             canvas.setAttribute("width", JSON.stringify(canvas.offsetWidth));
             canvas.setAttribute("height", JSON.stringify(canvas.offsetWidth));
 
+            // 2b. then the overlay with play button
             let overlay = document.createElement("canvas");
             overlay.classList.add("overlay");
             overlay.classList.add("clickable");
@@ -83,10 +97,13 @@ window.addEventListener("load", ():void => {
             overlay.setAttribute("height", JSON.stringify(overlay.offsetWidth));
             drawOverlay(overlay, window.getComputedStyle(container).color);
 
+            // 2c. Everything created = element becomes clickable
             container.classList.remove("running");
             loader++;
 
             if (loader === containers.length){
+                // 3a. When all images are loaded & canvases created, calculate their positions and store in array 
+                // + retrieve theme color from CSS -> to be used on scroll
                 let chapterCollection = document.getElementsByClassName("chapter");
                 for (let chapter of chapterCollection){
                     let chapterOffset: number = chapter.getBoundingClientRect().top + window.scrollY,
@@ -95,6 +112,7 @@ window.addEventListener("load", ():void => {
                     
                     chapterColors.push({color: canvasColor, offset: chapterOffset});
                     
+                    // 3b. Add theme color to headers
                     let header: HTMLHeadingElement | null = chapter.querySelector("h2");
                     if (header){
                         header.style.textShadow = "0.05em 0.05em 0.1em " + canvasColor;
@@ -108,6 +126,7 @@ window.addEventListener("load", ():void => {
     }
 });
 
+// On scroll, check which background-color applies
 interface Chapter {
     color: string;
     offset: number;
@@ -115,11 +134,12 @@ interface Chapter {
 let chapterColors: Chapter[] = [];
 
 window.addEventListener("scroll", (e: Event): void => {
-    // 1. GET SCREEN HEIGHT & SCROLL OFFSET
+    // 1. Get screen height & scroll offset
     let scrollY: number = window.scrollY + screen.height*0.33,
         underlay: HTMLElement | null = document.getElementById("underlay");
 
     if (chapterColors.length > 0 && underlay){
+        // 2. Loop through chapter array, front to back; apply background-color
         for (let chapter of chapterColors){
             if (scrollY >= chapter.offset){
                 underlay.style.backgroundColor = chapter.color;

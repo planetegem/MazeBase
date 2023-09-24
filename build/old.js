@@ -1,4 +1,5 @@
 "use strict";
+// TEST GIT CHANGE
 function getRandom(low, high) {
     return Math.floor((Math.random() * (high - low) * 0.5)) * 2 + low;
 }
