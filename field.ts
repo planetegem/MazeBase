@@ -1,3 +1,6 @@
+// New coordinate field: field consists of blocks instead of cells.
+// Each block track state of its border: walled or not
+// Blocks can be masked to exclude them from maze generation
 
 interface Block { // Basic building block, tracks:
     readonly x: number; // x-coordinate = index in top array
@@ -32,6 +35,8 @@ interface Maze2D {
 interface MazeConstructor extends Maze2D {
     new (width: number, height: number): Maze2D;
 }
+
+// Field creation
 class NewMaze implements Maze2D {
     public field: field2D;
     public animatedField: animation2D = [];
@@ -39,6 +44,8 @@ class NewMaze implements Maze2D {
     constructor (protected readonly xLength: number, protected readonly yLength: number){
         this.field = this.newField();
     }
+
+    // Creation of Coordinate field
     protected newField(mask: mask = this.standardMask): field2D {
         let width: number = this.xLength, height: number = this.yLength;
         let field: field2D = [];
@@ -53,7 +60,7 @@ class NewMaze implements Maze2D {
         }
         return field;
     }
-    // MASKS
+    // Standard mask: all blocks are part of maze, outside walls are created
     protected standardMask (x: number, y: number, width: number, height: number): Block {
         let block: Block = new Block(x, y);
         if (y === 0){
@@ -68,6 +75,7 @@ class NewMaze implements Maze2D {
         }
         return block;
     }
+    // Octagon mask: diagonal lines at corners determine mask
     protected octoMask (x: number, y: number, width: number, height: number): Block {
         let block: Block = new Block(x, y);
         let cornerSize: number = Math.floor(width/3);
@@ -101,6 +109,8 @@ class NewMaze implements Maze2D {
 
         return block;
     }
+
+    // Utility method: save current field to animation history
     protected saveField(field: field2D, target: animation2D): animation2D {
         let width: number = field.length, height: number = field[0].length;
         let copiedField: field2D = [];
@@ -115,6 +125,8 @@ class NewMaze implements Maze2D {
         target.push(copiedField);
         return target;
     }
+
+    // Draw function during animation: determines how field array is drawn on canvas
     public drawMaze(canvas: HTMLCanvasElement, field: field2D, color: string, image: HTMLImageElement): void {
         let ctx: CanvasRenderingContext2D | null = canvas.getContext("2d"),
             mazeWidth: number = field.length,

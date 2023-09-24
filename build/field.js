@@ -1,4 +1,7 @@
 "use strict";
+// New coordinate field: field consists of blocks instead of cells.
+// Each block track state of its border: walled or not
+// Blocks can be masked to exclude them from maze generation
 class Block {
     constructor(x, y, mask = false) {
         this.x = x;
@@ -12,6 +15,7 @@ class Block {
         this.left = false;
     }
 }
+// Field creation
 class NewMaze {
     constructor(xLength, yLength) {
         this.xLength = xLength;
@@ -19,6 +23,7 @@ class NewMaze {
         this.animatedField = [];
         this.field = this.newField();
     }
+    // Creation of Coordinate field
     newField(mask = this.standardMask) {
         let width = this.xLength, height = this.yLength;
         let field = [];
@@ -32,7 +37,7 @@ class NewMaze {
         }
         return field;
     }
-    // MASKS
+    // Standard mask: all blocks are part of maze, outside walls are created
     standardMask(x, y, width, height) {
         let block = new Block(x, y);
         if (y === 0) {
@@ -49,6 +54,7 @@ class NewMaze {
         }
         return block;
     }
+    // Octagon mask: diagonal lines at corners determine mask
     octoMask(x, y, width, height) {
         let block = new Block(x, y);
         let cornerSize = Math.floor(width / 3);
@@ -86,6 +92,7 @@ class NewMaze {
         }
         return block;
     }
+    // Utility method: save current field to animation history
     saveField(field, target) {
         let width = field.length, height = field[0].length;
         let copiedField = [];
@@ -100,6 +107,7 @@ class NewMaze {
         target.push(copiedField);
         return target;
     }
+    // Draw function during animation: determines how field array is drawn on canvas
     drawMaze(canvas, field, color, image) {
         let ctx = canvas.getContext("2d"), mazeWidth = field.length, mazeHeight = field[0].length, marginX = (canvas.width % mazeWidth) / 2, marginY = (canvas.height % mazeHeight) / 2, cellWidth = Math.floor(canvas.width / mazeWidth), cellHeight = Math.floor(canvas.height / mazeHeight);
         if (ctx) {
