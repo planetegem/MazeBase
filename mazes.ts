@@ -235,7 +235,7 @@ class AldousBroder extends NewMaze {
 
 
 
-
+/*
 class RoundRecursiveMaze extends SimpleBacktrack {
     constructor (width: number, length: number){
         super(width, length);
@@ -265,4 +265,4 @@ class RoundRecursiveMaze extends SimpleBacktrack {
             }
         }
     }
-}
+}*/

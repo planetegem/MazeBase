@@ -1,117 +1,13 @@
+// Mazes made with hollow type coordinate field, meaning:
+// cells track if they are walls of path
+// Used in the first 3 mazes on page;
 
-// TEST GIT CHANGE
-
+// Used to get random x & y coordinates
 function getRandom(low: number, high: number){
     return Math.floor((Math.random()*(high - low)*0.5))*2 + low; 
 }
-class SimpleCell {
-    constructor (public wall: boolean = true, public visited: boolean = false, public path: boolean = false){}
-}
-class Cell extends SimpleCell {
-    constructor (public readonly x: number, public readonly y: number, public readonly z: number){
-        super();
-    }
-}
-type oldField = Cell[][][];
-type animatedField = SimpleCell[][][][];
-interface MazeClassConstructor extends MazeClass {
-    new (width: number, height: number, depth?: number): MazeClass;
-}
-interface MazeClass {
-    field: oldField;
-    animatedField: animatedField;
-    drawMaze: (canvas: HTMLCanvasElement, field: oldField | SimpleCell[][][], color: string, image: HTMLImageElement) => void;
-}
 
-class BlankMaze implements MazeClass { 
-    protected xLength: number;
-    protected yLength: number;
-    protected zLength: number;
-    public field: oldField;
-    public animatedField: animatedField = [];
-    
-    constructor (width: number, height: number, depth: number = 1){
-        this.xLength = 2*width + 1;
-        this.yLength = 2*height + 1;
-        this.zLength = 2*depth + 1;
-        this.field = this.generateField();
-    }
-    // BUILD EMPTY FIELD
-    protected generateField(): oldField {
-        let width: number = this.xLength, height: number = this.yLength, depth: number = this.zLength;
-        let xArray = [];
-        
-        for (let x = 0; x < width; x++){
-            let yArray = [];
-            for (let y = 0; y < height; y++){
-                let zArray = [];
-                for (let z = 0; z < depth; z++){
-                    zArray.push(new Cell(x, y, z));
-                    if (x === 0 || y === 0 || z === 0 || 
-                        x === this.xLength - 1 || y === this.yLength - 1 || z === this.zLength - 1){
-                        zArray[z].wall = true;
-                        zArray[z].visited = true;
-                    }
-                }
-                yArray.push(zArray);
-            }
-            xArray.push(yArray);
-        }
-        return xArray;
-    }
-    // SAVE COPY OF FIELD FOR USE IN ANIMATIONS
-    public saveField(field: oldField, target: animatedField): animatedField {
-        let width: number = field.length, height: number = field[0].length, depth: number = field[0][0].length;
-        let copiedField: SimpleCell[][][] = [];
-        for (let x = 0; x < width; x++){
-            let copiedY: SimpleCell[][] = [];
-            for (let y = 0; y < height; y++){
-                let copiedZ: SimpleCell[] = [];
-                for (let z = 0; z < depth; z++){
-                    copiedZ.push(new SimpleCell(field[x][y][1].wall, field[x][y][1].visited, field[x][y][1].path));
-                }
-                copiedY.push(copiedZ);
-            }
-            copiedField.push(copiedY);
-        }
-        target.push(copiedField);
-        return target;
-    }
-    public drawMaze(canvas: HTMLCanvasElement, field: oldField | SimpleCell[][][], color: string, image: HTMLImageElement): void {
-        let ctx: CanvasRenderingContext2D | null = canvas.getContext("2d"),
-            mazeWidth: number = field.length,
-            mazeHeight: number = field[0].length,
-            marginX: number = (canvas.width % mazeWidth)/2,
-            marginY: number = (canvas.height % mazeHeight)/2,
-            cellWidth: number = Math.floor(canvas.width/mazeWidth),
-            cellHeight: number = Math.floor(canvas.height/mazeHeight);        
-    
-        if (ctx){
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(image, 0 + marginX, 0 + marginY, canvas.width - marginX*2, canvas.height - marginY*2);
-            for (let x = 0; x < mazeWidth; x++){
-                for (let y = 0; y < mazeHeight; y++){
-                    if (field[x][y][1].wall && field[x][y][1].visited){
-                        ctx.globalAlpha = 1;
-                        ctx.fillStyle = color;
-                        ctx.fillRect(marginX + x*cellWidth, marginY + y*cellHeight, cellWidth, cellHeight);
-                    } else if (field[x][y][1].path){
-                        ctx.globalAlpha = 1;
-                        ctx.fillStyle = "purple";
-                        ctx.fillRect(marginX + x*cellWidth, marginY + y*cellHeight, cellWidth, cellHeight);
-                    } else if (!field[x][y][1].visited){
-                        ctx.globalAlpha = 1;
-                        ctx.fillStyle = "white";
-                        ctx.fillRect(marginX + x*cellWidth, marginY + y*cellHeight, cellWidth, cellHeight);
-                        ctx.globalAlpha = 0.2;
-                        ctx.fillStyle = color;
-                        ctx.fillRect(marginX + x*cellWidth, marginY +  y*cellHeight, cellWidth, cellHeight);
-                    }
-                }
-            }
-        }
-    }
-}
+// Recursive Division algorithm
 interface RecursiveZone {
     minX: number;
     maxX: number;
@@ -216,6 +112,8 @@ class RecursiveMaze extends BlankMaze {
         return animatedField;
     }
 }
+
+// Prim's Algorithm
 class PrimsMaze extends BlankMaze {
     constructor (width: number, length: number){
         super(width, length);
@@ -311,6 +209,7 @@ class PrimsMaze extends BlankMaze {
         return field;
     }
 }
+// Backtracker algorithm
 class SimpleBacktrack extends BlankMaze {
     constructor (width: number, length: number){
         super(width, length);

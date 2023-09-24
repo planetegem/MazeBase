@@ -220,22 +220,29 @@ class AldousBroder extends NewMaze {
         start(this.field, this.animatedField);
     }
 }
+/*
 class RoundRecursiveMaze extends SimpleBacktrack {
-    constructor(width, length) {
+    constructor (width: number, length: number){
         super(width, length);
     }
-    drawMaze(canvas, field, color) {
-        let ctx = canvas.getContext("2d"), mazeWidth = field.length - 1, mazeHeight = field[0].length, centerRadius = canvas.height * 0.05, cellWidth = Math.PI * 2 / mazeWidth, cellHeight = Math.round((canvas.height * 0.5 - centerRadius) * 1e6 / mazeHeight) / 1e6;
-        if (ctx) {
+    public drawMaze(canvas: HTMLCanvasElement, field: oldField | SimpleCell[][][], color: string): void {
+        let ctx: CanvasRenderingContext2D | null = canvas.getContext("2d"),
+            mazeWidth: number = field.length - 1,
+            mazeHeight: number = field[0].length,
+            centerRadius: number = canvas.height*0.05,
+            cellWidth: number = Math.PI*2/mazeWidth,
+            cellHeight: number = Math.round((canvas.height*0.5 - centerRadius)*1e6/mazeHeight)/1e6;
+    
+        if (ctx){
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            for (let x = 0; x < mazeWidth; x++) {
-                for (let y = 0; y < mazeHeight; y++) {
-                    if (field[x][y][1].wall && field[x][y][1].visited) {
+            for (let x = 0; x < mazeWidth; x++){
+                for (let y = 0; y < mazeHeight; y++){
+                    if (field[x][y][1].wall && field[x][y][1].visited){
                         ctx.globalAlpha = 1;
                         ctx.fillStyle = color;
                         ctx.beginPath();
-                        ctx.arc(canvas.width * 0.5, canvas.height * 0.5, centerRadius + (y + 1) * cellHeight, x * cellWidth, (x + 1) * cellWidth, false);
-                        ctx.arc(canvas.width * 0.5, canvas.height * 0.5, centerRadius + y * cellHeight, (x + 1) * cellWidth, x * cellWidth, true);
+                        ctx.arc(canvas.width*0.5, canvas.height*0.5, centerRadius + (y + 1)*cellHeight, x*cellWidth, (x + 1)*cellWidth, false);
+                        ctx.arc(canvas.width*0.5, canvas.height*0.5, centerRadius + y*cellHeight, (x + 1)*cellWidth, x*cellWidth, true);
                         ctx.closePath();
                         ctx.fill();
                     }
@@ -243,4 +250,4 @@ class RoundRecursiveMaze extends SimpleBacktrack {
             }
         }
     }
-}
+}*/

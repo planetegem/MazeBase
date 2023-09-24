@@ -21,12 +21,15 @@ type field2D = Block[][];
 type animation2D = field2D[];
 type mask = (x: number, y: number, width: number, height: number) => Block;
 
+
 interface Maze2D {
     field: field2D;
     animatedField: animation2D;
+    drawMaze: (canvas: HTMLCanvasElement, field: field2D, color: string, image: HTMLImageElement) => void;
 }
+
 interface MazeConstructor extends Maze2D {
-    new (width: number, height: number): MazeClass;
+    new (width: number, height: number): Maze2D;
 }
 class NewMaze implements Maze2D {
     public field: field2D;
