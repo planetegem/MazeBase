@@ -21,7 +21,7 @@ interface MazeClassConstructor extends MazeClass {
 interface MazeClass {
     field: oldField;
     animatedField: animatedField;
-    drawMaze: (canvas: HTMLCanvasElement, field: oldField | SimpleCell[][][], color: string, image: HTMLImageElement) => void;
+    drawMaze: (canvas: HTMLCanvasElement, field: any, color: string, image: HTMLImageElement) => void;
 }
 class BlankMaze implements MazeClass { 
     protected xLength: number;

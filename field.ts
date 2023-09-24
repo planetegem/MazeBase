@@ -1,10 +1,11 @@
-interface Block {
-    readonly x: number;
-    readonly y: number;
-    up: boolean; right: boolean; down: boolean; left: boolean;
-    mask: boolean;
-    visited: boolean;
-    path: boolean;
+
+interface Block { // Basic building block, tracks:
+    readonly x: number; // x-coordinate = index in top array
+    readonly y: number; // y-coordinate = index in 2nd array
+    up: boolean; right: boolean; down: boolean; left: boolean; // border status: wall or not
+    mask: boolean; // if mask, block is excluded from maze
+    visited: boolean; // visited by algorithm
+    path: boolean; // part of path (used by backtracker)
 }
 class Block implements Block {
     public visited: boolean = false;
@@ -17,17 +18,17 @@ class Block implements Block {
     constructor (public readonly x: number, public readonly y: number, 
                 public mask: boolean = false){}
 }
-type field2D = Block[][];
-type animation2D = field2D[];
-type mask = (x: number, y: number, width: number, height: number) => Block;
 
+type field2D = Block[][]; // field = 2D array, first index is x, 2nd index is y
+type animation2D = field2D[]; // history of changes to the maze, for animations
+type mask = (x: number, y: number, width: number, height: number) => Block; // passed as argument during field creation, determines mask
 
+// Constructor
 interface Maze2D {
     field: field2D;
     animatedField: animation2D;
-    drawMaze: (canvas: HTMLCanvasElement, field: field2D, color: string, image: HTMLImageElement) => void;
+    drawMaze: (canvas: HTMLCanvasElement, field: any, color: string, image: HTMLImageElement) => void;
 }
-
 interface MazeConstructor extends Maze2D {
     new (width: number, height: number): Maze2D;
 }
