@@ -1,0 +1,172 @@
+:root {
+    --fontSize: max(15px, 1vw);
+}
+body, html, h1, h2, h3, h4, h5 {
+    all: unset;
+}
+body {
+    background-color: #eeeeee;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: var(--fontSize);
+}
+main, footer {
+    display: flex;
+    flex-flow: column nowrap;
+    background-color: white;
+    margin: auto;
+    width: 80%;
+    max-width: 75vh;
+    position: relative;
+}
+.introduction img {
+    width: 60%;
+}
+.introduction sup {
+    font-variant: small-caps;
+    font-size: 0.95em;
+}
+h1 {
+    font-size: 1.6em;
+    font-variant: small-caps;
+    text-shadow: 0.1em 0.1em 0.1em #9f9f9f;
+}
+h5 {
+    font-size: 0.85em;
+    opacity: 0.65;
+    margin: 1em auto 0.75em;
+}
+.chapter, .introduction {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    margin: 1em auto 2em;
+    width: 100%;
+}
+.text {
+    text-align: center;
+    margin: 0 5%;
+}
+.text ol {
+    font-size: 0.8em;
+    opacity: 0.65;
+    width: 80%;
+    text-align: justify;
+    margin: 0;
+}
+h4 {
+    font-variant: small-caps;
+    text-align: center;
+    margin: 0.4em auto auto;
+    opacity: 0.65;
+}
+h2 {
+    font-size: 1.2em;
+    padding: 0.5em;
+    font-variant: small-caps;
+}
+h3 {
+    font-size: 0.9em;
+    opacity: 0.65;
+}
+.canvas-container {
+    width: 90%;
+    max-width: 60vh;
+    position: relative;
+    background-size: 0 0;
+}
+.canvas-container canvas {
+    width: 100%;
+}
+.overlay {
+    position: absolute;
+    top: 0; right: 0; bottom: 0; left: 0;
+    z-index: 2;
+    opacity: 0;
+}
+.loadedImg {
+    display: none;
+}
+.clickable {
+    opacity: 0.5;
+}
+.clickable:hover {
+    opacity: 1;
+    cursor: pointer;
+}
+.clicked:hover {
+    opacity: 0.8;
+    cursor: pointer;
+}
+
+
+#underlay {
+    z-index: -10;
+    opacity: 0.1;
+    position: fixed;
+    top: 0; left: 0;
+    height: 100vh;
+    width: 100vw;
+    transition: background-color 0.75s ease-in-out;
+}
+
+#recursive-division .canvas-container {
+    color: #f088dc;
+    background-image: url("assets/king.png");
+}
+#simple-prims .canvas-container {
+    color: #3ba9fd;
+    background-image: url("assets/cat.png");
+}
+#simple-backtracker .canvas-container {
+    color: #d7a029;
+    background-image: url("assets/pear.png");
+}
+#octagon .canvas-container {
+    color: #23928b;
+    background-image: url("assets/lab_demon.png");
+}
+#Aldous-Broder .canvas-container {
+    color: #23923d;
+    background-image: url("assets/cactus.png");
+}
+
+
+/* footer */
+footer {
+    font-size: calc(var(--fontSize)*0.8);
+    padding-top: 5em;
+}
+footer p {
+    font-size: 0.8em;
+    text-align: center;
+    font-family: Georgia sans-serif;
+}
+#returnbutton {
+    display: flex;
+    margin: auto;
+    align-items: center;
+    opacity: 0.8;
+    font-size: var(--gap);
+}
+#returnbutton h4 {
+    text-align: left;
+    margin: 0;
+    font-variant: small-caps;
+    margin-left: 0.3em;
+    font-weight: bold;
+}
+#return {
+    background-image: url("https://www.planetegem.be/images/returngrey.svg");
+    width: 6em;
+    height: 3em;
+    background-repeat:no-repeat;
+    background-size:contain;
+}
+#returnbutton:hover {
+    color: #7D1E2D;
+    border-color: #7D1E2D20;
+    cursor: pointer;
+}
+#returnbutton:hover #return {
+    background-image: url("https://www.planetegem.be/images/return.svg");
+}

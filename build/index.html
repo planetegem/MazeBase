@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv='content-type' content='text/html; charset=UTF-8'>
+    <meta name="description" content="Where mazes come to graze, a true maze graze place.">
+    <meta name="keywords" content="maze generation, javascript, typescript, recursive division algorithm, backtracker, prim's maze">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="index, follow">
+    <meta name="googlebot" content="notranslate">
+    <title>The Maze Base</title>
+    <meta name="author" content="Niels Van Damme">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main>
+        <segment id="underlay"></segment>
+        <segment class="introduction">
+            <img src="eb-logo.svg" alt="ENCYCLOPAEDIA BELGICA"/>
+            <h5>presents</h5>
+            <h1>The MaZe BaSe</h1>
+            <div class="text">
+                <p>Welcome to the Maze Base<sup>tm</sup>, a laboratory of labyrinths, a page to give every maze a place!</p>
+                <p>Originally started when I was revisiting the maze generation algorithms used in <a href="https://www.planetegem.be/eb/conspiracy_maze" target="_blank">The Conspiracy Maze</a> (as part of an effort to familiarize myself with Typescript's type system & lean a bit more into OOP), I intend to continue adding algorithms to this page as I go.</p>
+                <p>Scroll down to see animations of mazes being generated, a short description of the algorithm, and a step by step recap if you want to build your own.</p>
+            </div>
+        </segment>
+        <segment id="recursive-division" class="chapter">
+            <h2>1. Recursive Division Algorithm</h2>
+            <div class="canvas-container running" onclick="start(this, RecursiveMaze, 250, 20, 20)"></div>
+            <h3>click to generate maze</h3>
+            <div class="text">
+                <p>The recursive division algorithm divides a field into 4 zones and then connects these zones with 3 doors, thereby creating a very basic maze. This process is then repeated recursively to make the maze more detailed.</p>
+                <p>The advantage of this algorithm is that it's easy to implement and highly efficient: it requires a minimum amount of steps to attain a completed maze. The downside is that it does not make the most interesting maze. The first few (big) zones can easily be recogized.</p>
+                <h4>step by step</h4>
+                <ol> 
+                    <li>Create an array to store the zones to be divided. The first zone to divide is the entire field, so add this to the array.</li>
+                    <li>Pick a zone from the array to divide. Remove this zone from the array.</li>
+                    <li>Randomly divide the selected zone into 4 new zones. You can do this by finding a random point withinin the zone: this is the intersection of your 2 dividing walls.</li>
+                    <li>Place 3 random doors to connect the 4 new zones.</li>
+                    <li>Check the size of the each new zone: if it has not reached minimum size, add it to the zones array.</li>
+                    <li>Check the zones array. If not empty, there are still zones to be divided, so restart the process at step 2.</li>
+                </ol>
+                </div>
+        </segment>
+        <segment id="simple-prims" class="chapter">
+            <h2>2. Prim's Algorithm</h2>
+            <div class="canvas-container running" onclick="start(this, PrimsMaze, 55, 20, 20)"></div>
+            <h3>click to generate maze</h3>
+            <div class="text">
+                <p>Prim's algorithm grows a maze organically from its starting point. It does this by selecting a random cell to add to the maze, and then saving valid neighbours as 'frontier'. Next it selects a random cell from the frontier and repeats the process.</p>
+                <p>Fun to see growing and easy to build, Prim's algorithm is a joy to work with. On the other hand, it tends to generate short hallways in the maze, giving it a less interesting result.</p>
+                <h4>step by step</h4>
+                <ol> 
+                    <li>Create an array to act as frontier and add a random starting cell to it.</li>
+                    <li>Pick a random cell from the frontier. Make it part of the maze and remove it from the frontier.</li>
+                    <li>Check neighbouring cells: if a cell is found that is already part of the maze, bridge to it.</li>
+                    <li>Add all unvisited neighbours to the frontier.</li>
+                    <li>Check size of the frontier: if not empty, restart process at step 2.</li>
+                </ol>
+                </div>
+        </segment>
+        <segment id="simple-backtracker" class="chapter">
+            <h2>3. Simple Backtracker</h2>
+            <div class="canvas-container running" onclick="start(this, SimpleBacktrack, 55, 20, 20)"></div>
+            <h3>click to generate maze</h3>
+            <div class="text">
+                <p>The recursive backtracker is a classic among maze generation algorithms: it randomly tunnels its way through the field until it corners itself. At that point, it retraces its steps until it finds an opportunity to start a new path, thus starting the process again.</p>
+                <p>Not as efficient as Prim's or Recursive Division, the algorithm creates long winding hallways that are interesting to look at. You can be absorbed by watching it retrace its steps and feeling out its way through every cell of the maze. If applied correctly, the last cell to be touched will always be the same as the first.</p>
+                <h4>step by step</h4>
+                <ol> 
+                    <li>Create an array to store the path the algorithm has followed. Add a random cell to the path to give it a starting point.</li>
+                    <li>Select the last cell from the path array. If not part of the maze yet, add it now.</li>
+                    <li>Inspect the neighbours of this cell: if there are unvisited neighbours, choose one at random. If not, remove the cell from the path array and skip to step 5.</li>
+                    <li>Open wall to selected neighbour and add it to the end of the path array.</li>
+                    <li>Check path array: if not empty, restart process at step 2.</li>
+                </ol>
+                </div>
+        </segment>
+        <segment id="octagon" class="chapter">
+            <h2>4. The Octagon</h2>
+            <div class="canvas-container running" onclick="start(this, Backtracker, 55, 20, 20)"></div>
+            <h3>click to generate maze</h3>
+            <div class="text">
+                <p>The same recursive backtracker, but this time in the shape of an octagon. This is done by applying a simple mask to the starting field to remove the corner cells from the maze. The algorithm ignores these cells when building the maze.</p>
+                <p>You will also see a small change in how the walls of the maze are rendered: previously every cell was defined as either wall or path, but now there is no longer any dictinction. Rather, every cell now logs internally which of its sides need to be walled. This is a much more robust way of working that gives us a lot more options to draw mazes. Among other things, it makes it easier to apply masks to a maze.</p>
+            </div>
+        </segment>
+        <segment id="Aldous-Broder" class="chapter">
+            <h2>5. The Aldous-Broder Algorithm</h2>
+            <div class="canvas-container running" onclick="start(this, AldousBroder, 55, 12, 12)"></div>
+            <h3>click to generate maze</h3>
+            <div class="text">
+                <p>Unlike the previous algorithms which always showed a bias towards a certain result, the Aldous-Broder Algorithm (also known as a random walk algorithm) generates a truly random maze. As the term indicates, the algorithm simply randomly walks through the maze: if it encounters an unvisited cell, it makes this cell a part of the maze. It continues walking until it has randomly visited every cell.</p>
+                <p>While easy to code and giving a very nice result, the algorithm is not a very smart one. Due to its random nature, it can theoretically take an infinite number of steps for it to reach every cell. Don't get frustrated watching it walk past the last unvisited cell again and again!</p>
+                <h4>step by step</h4>
+                <ol> 
+                    <li>Select a random starting point. Mark this is your current cell.</li>
+                    <li>If the cell is unvisited, mark it as visited and build its walls. Check if there was a previous cell: if so, open the wall to this cell.</li>
+                    <li>Choose a random neighbour to jump to. Mark this neighbour as your current cell.</li>
+                    <li>Count the number of unvisited cells in the maze. If higher than 0, restart process at step 2.</li>
+                </ol>
+                </div>
+        </segment>
+    </main>
+    <footer>
+        <button id="returnbutton" onclick="location.href='https://www.planetegem.be'">
+            <img id="return">
+            <h4>return&nbsp;to<br>planetegem</h4>
+        </button>
+        <p>&#169; 2023 Niels Van Damme | info@planetegem.be | <a href="https://www.instagram.com/planetegem/" style="text-decoration:none;color:black;">www.instagram.com/planetegem</a> <br> &#9825; <a href="http://www.pecten.be" target="_blank" style="text-decoration:none;color:black;">www.pecten.be</a> &#9825;</p>
+    </footer>
+    <script src="old.js"></script>
+    <script src="template.js"></script>
+    <script src="mazes.js"></script>
+    <script src="listeners.js"></script>
+</body>
+</html>
