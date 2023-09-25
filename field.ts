@@ -183,8 +183,8 @@ class NewMaze implements Maze2D {
         if ((y >= height - margin*3 && x === margin*2 && y < height - margin*2) || (y >= height - margin*2 && x === margin*4 && y < height - margin)){
             block.left = true;
         }
-        if ((y === height - margin*3 && x < margin*2) || (y === height - margin*2 && x < margin*4 && x >= margin*2)){
-            block.up = true;
+        if ((y === height - margin*3 - 1 && x < margin*2) || (y === height - margin*2 - 1 && x < margin*4 && x >= margin*2)){
+            block.down = true;
         }
         // Bottom right: single block
         if (y >= height - margin*2 && x >= width - margin){
@@ -195,11 +195,11 @@ class NewMaze implements Maze2D {
             block.left = false;
         }
         // Correct walls
-        if (y >= height - margin*2 && y < height - margin && x === width - margin){
-            block.left = true;
+        if (y >= height - margin*2 && y < height - margin && x === width - margin - 1){
+            block.right = true;
         }
-        if (y === height - margin*2 && x >= width - margin){
-            block.up = true;
+        if (y === height - margin*2 - 1 && x >= width - margin){
+            block.down = true;
         } 
         return block;
     }
