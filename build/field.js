@@ -92,6 +92,102 @@ class NewMaze {
         }
         return block;
     }
+    // Brain mask
+    brainMask(x, y, width, height) {
+        let block = new Block(x, y);
+        // Minimum size = 8 blocks, else revert to standard mask
+        if (width < 8 || height < 8) {
+            return block = this.standardMask(x, y, width, height);
+        }
+        // First create standard walls
+        if (y === 0) {
+            block.up = true;
+        }
+        else if (y === height - 1) {
+            block.down = true;
+        }
+        if (x === 0) {
+            block.left = true;
+        }
+        else if (x === width - 1) {
+            block.right = true;
+        }
+        // Brain is wider than it is tall, so mask top and bottom row
+        let margin = Math.floor(height / 8);
+        if (y < margin || y >= height - margin) {
+            block.mask = true;
+            block.up = false;
+            block.right = false;
+            block.down = false;
+            block.left = false;
+        }
+        // Correct walls
+        if (y === margin) {
+            block.up = true;
+        }
+        if (y === height - margin - 1) {
+            block.down = true;
+        }
+        // Round edges at top
+        if ((y < margin * 2 && x < margin * 2) || (y < margin * 2 && x >= width - margin * 2)) {
+            block.mask = true;
+            block.up = false;
+            block.right = false;
+            block.down = false;
+            block.left = false;
+        }
+        if ((y < margin * 3 && x < margin) || (y < margin * 3 && x >= width - margin)) {
+            block.mask = true;
+            block.up = false;
+            block.right = false;
+            block.down = false;
+            block.left = false;
+        }
+        // Correct walls
+        if ((y < margin * 2 && x === margin * 2 && y >= margin) || (y < margin * 3 && x === margin && y >= margin * 2)) {
+            block.left = true;
+        }
+        if ((y === margin * 2 && x < margin * 2 && x >= margin) || (y === margin * 3 && x < margin)) {
+            block.up = true;
+        }
+        if ((y < margin * 2 && x === width - margin * 2 - 1 && y >= margin) || (y < margin * 3 && x === width - margin - 1 && y >= margin * 2)) {
+            block.right = true;
+        }
+        if ((y === margin * 2 && x >= width - margin * 2 && x < width - margin) || (y === margin * 3 && x >= width - margin)) {
+            block.up = true;
+        }
+        // Slope at bottom left
+        if ((y >= height - margin * 3 && x < margin * 2) || (y >= height - margin * 2 && x < margin * 4)) {
+            block.mask = true;
+            block.up = false;
+            block.right = false;
+            block.down = false;
+            block.left = false;
+        }
+        // Correct walls
+        if ((y >= height - margin * 3 && x === margin * 2 && y < height - margin * 2) || (y >= height - margin * 2 && x === margin * 4 && y < height - margin)) {
+            block.left = true;
+        }
+        if ((y === height - margin * 3 && x < margin * 2) || (y === height - margin * 2 && x < margin * 4 && x >= margin * 2)) {
+            block.up = true;
+        }
+        // Bottom right: single block
+        if (y >= height - margin * 2 && x >= width - margin) {
+            block.mask = true;
+            block.up = false;
+            block.right = false;
+            block.down = false;
+            block.left = false;
+        }
+        // Correct walls
+        if (y >= height - margin * 2 && y < height - margin && x === width - margin) {
+            block.left = true;
+        }
+        if (y === height - margin * 2 && x >= width - margin) {
+            block.up = true;
+        }
+        return block;
+    }
     // Utility method: save current field to animation history
     saveField(field, target) {
         let width = field.length, height = field[0].length;

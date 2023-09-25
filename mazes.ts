@@ -234,3 +234,11 @@ class AldousBroder extends NewMaze {
         start(this.field, this.animatedField);
     }
 }
+// Testing brain mask
+class TestMaze extends NewMaze {
+    constructor(protected readonly xLength: number, protected readonly yLength: number){
+        super(xLength, yLength);
+        this.field = this.newField(this.brainMask);
+        this.animatedField = this.saveField(this.field, this.animatedField);
+    }
+}

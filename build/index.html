@@ -101,6 +101,22 @@
                 </ol>
                 </div>
         </segment>
+        <segment id="test" class="chapter">
+            <h2>5. The Aldous-Broder Algorithm</h2>
+            <div class="canvas-container running" onclick="start(this, TestMaze, 55, 25, 25)"></div>
+            <h3>click to generate maze</h3>
+            <div class="text">
+                <p>Unlike the previous algorithms which always showed a bias towards a certain result, the Aldous-Broder Algorithm (also known as a random walk algorithm) generates a truly random maze. As the term indicates, the algorithm simply randomly walks through the maze: if it encounters an unvisited cell, it makes this cell a part of the maze. It continues walking until it has randomly visited every cell.</p>
+                <p>While easy to code and giving a very nice result, the algorithm is not a very smart one. Due to its random nature, it can theoretically take an infinite number of steps for it to reach every cell. Don't get frustrated watching it walk past the last unvisited cell again and again!</p>
+                <h4>step by step</h4>
+                <ol> 
+                    <li>Select a random starting point. Mark this is your current cell.</li>
+                    <li>If the cell is unvisited, mark it as visited and build its walls. Check if there was a previous cell: if so, open the wall to this cell.</li>
+                    <li>Choose a random neighbour to jump to. Mark this neighbour as your current cell.</li>
+                    <li>Count the number of unvisited cells in the maze. If higher than 0, restart process at step 2.</li>
+                </ol>
+                </div>
+        </segment>
     </main>
     <footer>
         <button id="returnbutton" onclick="location.href='https://www.planetegem.be'">
