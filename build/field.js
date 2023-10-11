@@ -92,6 +92,118 @@ class NewMaze {
         }
         return block;
     }
+    // Snowflake Mask
+    snowflakeMask(x, y, width, height) {
+        let block = new Block(x, y);
+        // Minimum size = 10 blocks, else revert to standard mask
+        if (width < 10 || height < 10) {
+            return block = this.standardMask(x, y, width, height);
+        }
+        let interval = Math.floor(width / 5), step1 = interval - 1, step2 = interval * 2, step3 = width - interval * 2 - 1, step4 = width - interval;
+        // Central protrusions
+        if (y === 0 && x >= step2 && x <= step3) {
+            block.up = true;
+        }
+        else if (y === height - 1 && x >= step2 && x <= step3) {
+            block.down = true;
+        }
+        else if (x === 0 && y >= step2 && y <= step3) {
+            block.left = true;
+        }
+        else if (x === width - 1 && y >= step2 && y <= step3) {
+            block.right = true;
+        }
+        if (x === step2 && (y < interval || y > height - interval - 1)) {
+            block.left = true;
+        }
+        else if (x === step3 && (y < interval || y > height - interval - 1)) {
+            block.right = true;
+        }
+        else if (y === step2 && (x < interval || x > width - interval - 1)) {
+            block.up = true;
+        }
+        else if (y === step3 && (x < interval || x > width - interval - 1)) {
+            block.down = true;
+        }
+        else if (y === interval && (x === step2 - 1 || x === step3 + 1)) {
+            block.up = true;
+        }
+        else if (y === height - (interval + 1) && (x === step2 - 1 || x === step3 + 1)) {
+            block.down = true;
+        }
+        else if (x === interval && (y === step2 - 1 || y === step3 + 1)) {
+            block.left = true;
+        }
+        else if (x === width - (interval + 1) && (y === step2 - 1 || y === step3 + 1)) {
+            block.right = true;
+        }
+        // Corner appendages
+        if (y < interval) {
+            if (y === 0 && (x < step1 || x > step4)) {
+                block.up = true;
+            }
+            else if (x === step1 + y) {
+                block.right = true;
+                block.up = true;
+            }
+            else if (x === step4 - y) {
+                block.left = true;
+                block.up = true;
+            }
+            else if (x > step1 + y && x < step4 - y && !(x >= step2 && x <= step3)) {
+                block.mask = true;
+            }
+        }
+        else if (y > height - (interval + 1)) {
+            if (y === height - 1 && (x < step1 || x > step4)) {
+                block.down = true;
+            }
+            else if (x === step1 + (height - y - 1)) {
+                block.right = true;
+                block.down = true;
+            }
+            else if (x === step4 - (height - y - 1)) {
+                block.left = true;
+                block.down = true;
+            }
+            else if (x > step1 + (height - y - 1) && x < step4 - (height - y - 1) && !(x >= step2 && x <= step3)) {
+                block.mask = true;
+            }
+        }
+        if (x < interval) {
+            if (x === 0 && (y < step1 || y > step4)) {
+                block.left = true;
+            }
+            else if (y === step1 + x) {
+                block.down = true;
+                block.left = true;
+            }
+            else if (y === step4 - x) {
+                block.up = true;
+                block.left = true;
+            }
+            else if (y > step1 + x && y < step4 - x && !(y >= step2 && y <= step3)) {
+                block.mask = true;
+            }
+        }
+        else if (x > width - (interval + 1)) {
+            if (x === width - 1 && (y < step1 || y > step4)) {
+                block.right = true;
+            }
+            else if (y === step1 + (width - x - 1)) {
+                block.down = true;
+                block.right = true;
+            }
+            else if (y === step4 - (width - x - 1)) {
+                block.up = true;
+                block.right = true;
+            }
+            else if (y > step1 + (width - x - 1) && y < step4 - (width - x - 1) && !(y >= step2 && y <= step3)) {
+                block.mask = true;
+            }
+        }
+        return block;
+    }
     // Brain mask
     brainMask(x, y, width, height) {
         let block = new Block(x, y);

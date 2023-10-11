@@ -122,6 +122,7 @@ class Backtracker extends NewMaze {
 class AldousBroder extends NewMaze {
     constructor(protected readonly xLength: number, protected readonly yLength: number){
         super(xLength, yLength);
+        this.field = this.newField(this.snowflakeMask);
         this.animatedField = this.saveField(this.field, this.animatedField);
         this.recursion();
     }

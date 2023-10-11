@@ -121,6 +121,7 @@ class AldousBroder extends NewMaze {
         super(xLength, yLength);
         this.xLength = xLength;
         this.yLength = yLength;
+        this.field = this.newField(this.snowflakeMask);
         this.animatedField = this.saveField(this.field, this.animatedField);
         this.recursion();
     }
