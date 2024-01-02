@@ -14,8 +14,8 @@ main, footer {
     flex-flow: column nowrap;
     background-color: white;
     margin: auto;
-    width: 80%;
-    max-width: 75vh;
+    width: 95%;
+    max-width: 85vh;
     position: relative;
 }
 .introduction img {

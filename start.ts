@@ -77,9 +77,15 @@ window.addEventListener("load", ():void => {
         let url: string = window.getComputedStyle(container).backgroundImage;
         url = url.split("assets/")[1];
         url = (url) ? "assets/" + url.substring(0, url.length - 2) : "assets/cat.png"; // If no background image in css, default to cat
-
         let imgPreload: HTMLImageElement = document.createElement("img");
         
+        // 1b. While image is loading, preset overlay
+        let overlay = document.createElement("canvas");
+        overlay.classList.add("overlay");
+        container.appendChild(overlay);
+        overlay.setAttribute("width", JSON.stringify(overlay.offsetWidth));
+        overlay.setAttribute("height", JSON.stringify(overlay.offsetWidth));
+
         imgPreload.onload = ():void => {
             // 2a. Once image is loaded, create canvas elements: first the canvas where the maze will be drawn
             let canvas = document.createElement("canvas");
@@ -89,12 +95,7 @@ window.addEventListener("load", ():void => {
             canvas.setAttribute("height", JSON.stringify(canvas.offsetWidth));
 
             // 2b. then the overlay with play button
-            let overlay = document.createElement("canvas");
-            overlay.classList.add("overlay");
             overlay.classList.add("clickable");
-            container.appendChild(overlay);
-            overlay.setAttribute("width", JSON.stringify(overlay.offsetWidth));
-            overlay.setAttribute("height", JSON.stringify(overlay.offsetWidth));
             drawOverlay(overlay, window.getComputedStyle(container).color);
 
             // 2c. Everything created = element becomes clickable
