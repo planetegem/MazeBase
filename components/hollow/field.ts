@@ -1,68 +1,40 @@
-// New coordinate field: field consists of blocks instead of cells.
-// Each block track state of its border: walled or not
-// Blocks can be masked to exclude them from maze generation
+type hollowField = HollowCell[][]; // field = 2D array, first index is x, 2nd index is y
+type hollowAnimation = hollowField[]; // history of changes to the maze, for animations
 
-interface Block { // Basic building block, tracks:
-    readonly x: number; // x-coordinate = index in top array
-    readonly y: number; // y-coordinate = index in 2nd array
-    up: boolean; right: boolean; down: boolean; left: boolean; // border status: wall or not
-    mask: boolean; // if mask, block is excluded from maze
-    visited: boolean; // visited by algorithm
-    path: boolean; // part of path (used by backtracker)
-}
-class Block implements Block {
-    public visited: boolean = false;
-    public path: boolean = false;
-    public up: boolean = false;
-    public right: boolean = false;
-    public down: boolean = false;
-    public left: boolean = false;
-
-    constructor (public readonly x: number, public readonly y: number, 
-                public mask: boolean = false){}
-}
-
-type field2D = Block[][]; // field = 2D array, first index is x, 2nd index is y
-type animation2D = field2D[]; // history of changes to the maze, for animations
-type mask = (x: number, y: number, width: number, height: number) => Block; // passed as argument during field creation, determines mask
-
-// Constructor
-interface Maze2D {
-    field: field2D;
-    animatedField: animation2D;
-    drawMaze: (canvas: HTMLCanvasElement, field: any, color: string, image: HTMLImageElement) => void;
-}
-interface MazeConstructor extends Maze2D {
-    new (width: number, height: number): Maze2D;
-}
+type mask = (x: number, y: number, width: number, height: number) => HollowCell; // passed as argument during field creation, determines mask
 
 // Field creation
-class NewMaze implements Maze2D {
-    public field: field2D;
-    public animatedField: animation2D = [];
+class HollowMaze implements FieldInterface<hollowField> {
 
-    constructor (protected readonly xLength: number, protected readonly yLength: number){
-        this.field = this.newField();
+    protected xLength: number;
+    protected yLength: number;
+    public field: hollowField = [];
+    public animatedField: hollowAnimation = [];
+
+    constructor (xLength: number, yLength: number){
+        this.xLength = xLength;
+        this.yLength = yLength;
     }
 
     // Creation of Coordinate field
-    protected newField(mask: mask = this.standardMask): field2D {
+    protected generateField(mask: mask = this.standardMask): hollowField {
         let width: number = this.xLength, height: number = this.yLength;
-        let field: field2D = [];
+        let field: hollowField = [];
 
         for (let x = 0; x < width; x++){
-            let column: Block[] = [];
+            let column: HollowCell[] = [];
             for (let y = 0; y < height; y++){
-                let block: Block = mask(x, y, width, height);
-                column.push(block);
+                let cell: HollowCell = mask(x, y, width, height);
+                column.push(cell);
             }
             field.push(column);
         }
         return field;
     }
+
     // Standard mask: all blocks are part of maze, outside walls are created
-    protected standardMask (x: number, y: number, width: number, height: number): Block {
-        let block: Block = new Block(x, y);
+    protected standardMask (x: number, y: number, width: number, height: number): HollowCell {
+        let block: HollowCell = new HollowCell(x, y);
         if (y === 0){
             block.up = true
         } else if (y === height - 1){
@@ -75,9 +47,10 @@ class NewMaze implements Maze2D {
         }
         return block;
     }
+
     // Octagon mask: diagonal lines at corners determine mask
-    protected octoMask (x: number, y: number, width: number, height: number): Block {
-        let block: Block = new Block(x, y);
+    protected octoMask (x: number, y: number, width: number, height: number): HollowCell {
+        let block: HollowCell = new HollowCell(x, y);
         let cornerSize: number = Math.floor(width/3);
 
         if (x < cornerSize - y || x >= width - (cornerSize - y) || y >= height - (cornerSize - x) || y >= height - cornerSize + (height - x) - 1){
@@ -109,9 +82,10 @@ class NewMaze implements Maze2D {
 
         return block;
     }
+
     // Snowflake Mask
-    protected snowflakeMask(x: number, y: number, width: number, height: number): Block {
-        let block: Block = new Block(x, y);
+    protected snowflakeMask(x: number, y: number, width: number, height: number): HollowCell {
+        let block: HollowCell = new HollowCell(x, y);
         // Minimum size = 10 blocks, else revert to standard mask
         if (width < 10 || height < 10){
             return block = this.standardMask(x, y, width, height)
@@ -202,9 +176,10 @@ class NewMaze implements Maze2D {
         }
         return block;
     }
+
     // Brain mask
-    protected brainMask(x: number, y: number, width: number, height: number): Block {
-        let block: Block = new Block(x, y);
+    protected brainMask(x: number, y: number, width: number, height: number): HollowCell {
+        let block: HollowCell = new HollowCell(x, y);
         // Minimum size = 8 blocks, else revert to standard mask
         if (width < 8 || height < 8){
             return block = this.standardMask(x, y, width, height)
@@ -298,23 +273,29 @@ class NewMaze implements Maze2D {
     }
 
     // Utility method: save current field to animation history
-    protected saveField(field: field2D, target: animation2D): animation2D {
-        let width: number = field.length, height: number = field[0].length;
-        let copiedField: field2D = [];
-        for (let x = 0; x < width; x++){
-            let copiedY: Block[] = [];
-            for (let y = 0; y < height; y++){
-                let block: Block = JSON.parse(JSON.stringify(field[x][y]));
-                copiedY.push(block);
-            }
-            copiedField.push(copiedY);
-        }
+    protected saveField(field: hollowField, target: hollowAnimation): hollowAnimation {
+        let copiedField: HollowCell[][] = JSON.parse(JSON.stringify(field));
         target.push(copiedField);
         return target;
     }
 
+    // Utility method: get random start position (and if masked, try again)
+    protected getFirst(field: hollowField): HollowCell {
+        let randomX: number = Math.floor(Math.random()*(field.length)),
+            randomY: number = Math.floor(Math.random()*(field[0].length)),
+            block: HollowCell;
+        
+        if (field[randomX][randomY].mask){
+            // TRY AGAIN
+            return block = this.getFirst(field);
+        } else {
+            block = field[randomX][randomY];
+            return block;
+        }
+    }
+
     // Draw function during animation: determines how field array is drawn on canvas
-    public drawMaze(canvas: HTMLCanvasElement, field: field2D, color: string, image: HTMLImageElement): void {
+    public drawMaze(canvas: HTMLCanvasElement, field: hollowField, color: string, image: HTMLImageElement): void {
         let ctx: CanvasRenderingContext2D | null = canvas.getContext("2d"),
             mazeWidth: number = field.length,
             mazeHeight: number = field[0].length,
@@ -328,7 +309,7 @@ class NewMaze implements Maze2D {
             ctx.drawImage(image, marginX, marginY, canvas.width - 2*marginX, canvas.height - 2*marginY);
             for (let x = 0; x < mazeWidth; x++){
                 for (let y = 0; y < mazeHeight; y++){
-                    let currentBlock: Block = field[x][y];
+                    let currentBlock: HollowCell = field[x][y];
                     // DRAW FOG
                     if (!currentBlock.visited){
                         ctx.globalAlpha = 1;
@@ -366,7 +347,7 @@ class NewMaze implements Maze2D {
                         ctx.fillRect(marginX + x*cellWidth, marginY + y*cellHeight, cellWidth*0.25, cellHeight);
                     }         
                     // DRAW CORNERS
-                    let block1: Block, block2: Block, mask: Block;
+                    let block1: HollowCell, block2: HollowCell, mask: HollowCell;
                     if (x > 0 && y > 0 && !currentBlock.mask){
                         block1 = field[currentBlock.x - 1][currentBlock.y];
                         block2 = field[currentBlock.x][currentBlock.y - 1];

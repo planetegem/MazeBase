@@ -1,33 +1,60 @@
 
+function addCanvasListeners(){
+    // Solid mazes
+    const canvas1 = document.getElementById("canvas-recDiv");
+    if (canvas1){
+        canvas1.addEventListener("click", () => startMaze<solidField>(canvas1, new RecursiveMaze(20, 20), 250));
+    }
+    const canvas2 = document.getElementById("canvas-primMaze");
+    if (canvas2){
+        canvas2.addEventListener("click", () => startMaze<solidField>(canvas2, new PrimsMaze(20, 20), 55));
+    }
+    const canvas3 = document.getElementById("canvas-simpleBacktrack");
+    if (canvas3){
+        canvas3.addEventListener("click", () => startMaze<solidField>(canvas3, new SimpleBacktrack(20, 20), 55));
+    }
+    // Hollow mazes
+    const canvas4 = document.getElementById("canvas-hollowBacktrack");
+    if (canvas4){
+        canvas4.addEventListener("click", () => startMaze<hollowField>(canvas4, new Backtracker(20, 20), 55));
+    }
+    const canvas5 = document.getElementById("canvas-randomWalk");
+    if (canvas5){
+        canvas5.addEventListener("click", () => startMaze<hollowField>(canvas5, new AldousBroder(12, 12), 55));
+    }
+    const canvas6 = document.getElementById("canvas-tunneler");
+    if (canvas6 != null){
+        canvas6.addEventListener("click", () => startMaze<hollowField>(canvas6, new FrontierTunneler(24, 24), 40));
+    }
+}
+
 // Function to start animating maze: creates new maze object and animates it on canvas click
-function start(
+function startMaze<F>(
     clickedElement: any, // element is clicked to start function
-    mazeType: MazeClassConstructor | MazeConstructor, // Select constructor: MazeClassConstructor = old interface
-    speed: number, // Determines number of ticks between each animation step
-    width: number, // Maze width
-    height: number // Maze height
+    maze: FieldInterface<F>, // new maze
+    speed: number, // determines number of ticks between each animation step
 ): void {
+    console.log("started");
     if (!clickedElement.classList.contains("running")){
         clickedElement.classList.add("running"); // Blocks double execution
         clickedElement.getElementsByClassName("overlay")[0].classList.remove("clickable");
         clickedElement.getElementsByClassName("overlay")[0].classList.remove("clicked");
 
-        let newMaze = new mazeType(width, height),
-            canvas: HTMLCanvasElement = clickedElement.getElementsByClassName("maze")[0],
+        let canvas: HTMLCanvasElement = clickedElement.getElementsByClassName("maze")[0],
             color: string = window.getComputedStyle(clickedElement).color,
             background: HTMLImageElement = clickedElement.getElementsByClassName("loadedImg")[0];
     
         let animationStart: number = Date.now(),
-            steps: number = newMaze.animatedField.length;
+            steps: number = maze.animatedField.length;
 
         function animate(): void {
             let runtime: number = Date.now() - animationStart,
                 currentStep: number = Math.max(0, Math.floor((runtime - 500)/speed));
                     
-            if (newMaze.animatedField[currentStep]){
-                newMaze.drawMaze(canvas, newMaze.animatedField[currentStep], color, background);
+            if (maze.animatedField[currentStep]){
+                maze.drawMaze(canvas, maze.animatedField[currentStep], color, background);
             } else {
-                newMaze.drawMaze(canvas, newMaze.field, color, background);
+                maze.drawMaze(canvas, maze.field, color, background);
             }
             if (runtime <= (steps*speed + 1500)){
                 window.requestAnimationFrame(animate);
@@ -119,6 +146,7 @@ window.addEventListener("load", ():void => {
                         header.style.textShadow = "0.05em 0.05em 0.1em " + canvasColor;
                     }
                 }
+                addCanvasListeners();
             }
         }
         imgPreload.src = url;

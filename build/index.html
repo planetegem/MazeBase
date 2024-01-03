@@ -26,7 +26,7 @@
         </segment>
         <segment id="recursive-division" class="chapter">
             <h2>1. Recursive Division Algorithm</h2>
-            <div class="canvas-container running" onclick="start(this, RecursiveMaze, 250, 20, 20)"></div>
+            <div class="canvas-container running" id="canvas-recDiv"></div>
             <h3>click to generate maze</h3>
             <div class="text">
                 <p>The recursive division algorithm divides a field into 4 zones and then connects these zones with 3 doors, thereby creating a very basic maze. This process is then repeated recursively to make the maze more detailed.</p>
@@ -44,7 +44,7 @@
         </segment>
         <segment id="simple-prims" class="chapter">
             <h2>2. Prim's Algorithm</h2>
-            <div class="canvas-container running" onclick="start(this, PrimsMaze, 55, 20, 20)"></div>
+            <div class="canvas-container running" id="canvas-primMaze"></div>
             <h3>click to generate maze</h3>
             <div class="text">
                 <p>Prim's algorithm grows a maze organically from its starting point. It does this by selecting a random cell to add to the maze, and then saving valid neighbours as 'frontier'. Next it selects a random cell from the frontier and repeats the process.</p>
@@ -61,7 +61,7 @@
         </segment>
         <segment id="simple-backtracker" class="chapter">
             <h2>3. Simple Backtracker</h2>
-            <div class="canvas-container running" onclick="start(this, SimpleBacktrack, 55, 20, 20)"></div>
+            <div class="canvas-container running" id="canvas-simpleBacktrack"></div>
             <h3>click to generate maze</h3>
             <div class="text">
                 <p>The recursive backtracker is a classic among maze generation algorithms: it randomly tunnels its way through the field until it corners itself. At that point, it retraces its steps until it finds an opportunity to start a new path, thus starting the process again.</p>
@@ -78,7 +78,7 @@
         </segment>
         <segment id="octagon" class="chapter">
             <h2>4. The Octagon</h2>
-            <div class="canvas-container running" onclick="start(this, Backtracker, 55, 20, 20)"></div>
+            <div class="canvas-container running" id="canvas-hollowBacktrack"></div>
             <h3>click to generate maze</h3>
             <div class="text">
                 <p>The same recursive backtracker, but this time in the shape of an octagon. This is done by applying a simple mask to the starting field to remove the corner cells from the maze. The algorithm ignores these cells when building the maze.</p>
@@ -87,7 +87,7 @@
         </segment>
         <segment id="Aldous-Broder" class="chapter">
             <h2>5. The Aldous-Broder Algorithm</h2>
-            <div class="canvas-container running" onclick="start(this, AldousBroder, 55, 12, 12)"></div>
+            <div class="canvas-container running" id="canvas-randomWalk"></div>
             <h3>click to generate maze</h3>
             <div class="text">
                 <p>Unlike the previous algorithms which always showed a bias towards a certain result, the Aldous-Broder Algorithm (also known as a random walk algorithm) generates a truly random maze. As the term indicates, the algorithm simply randomly walks through the maze: if it encounters an unvisited cell, it makes this cell a part of the maze. It continues walking until it has randomly visited every cell.</p>
@@ -103,7 +103,7 @@
         </segment>
         <segment id="random-tunneler" class="chapter">
             <h2>6. RANDOM TUNNELER</h2>
-            <div class="canvas-container running" onclick="start(this, FrontierTunneler, 40, 24, 24)"></div>
+            <div class="canvas-container running" id="canvas-tunneler"></div>
             <h3>click to generate maze</h3>
             <div class="text">
                 <p>This algorithm is a variation on the backtracker: like the backtracker, it starts tunneling in a random direction until it reaches a dead end. However, at that point it doesn't retrace its steps, but selects a new unvisited cell to start over. The algorithm ends when it can't find any unvisited cells anymore.</p>
@@ -125,10 +125,6 @@
         </button>
         <p>&#169; 2023 Niels Van Damme | info@planetegem.be | <a href="https://www.instagram.com/planetegem/" style="text-decoration:none;color:black;">www.instagram.com/planetegem</a> <br> &#9825; <a href="http://www.pecten.be" target="_blank" style="text-decoration:none;color:black;">www.pecten.be</a> &#9825;</p>
     </footer>
-    <script src="oldfield.js"></script>
-    <script src="oldmazes.js"></script>
-    <script src="field.js"></script>
-    <script src="mazes.js"></script>
-    <script src="start.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
