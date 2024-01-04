@@ -1,33 +1,3 @@
-
-function addCanvasListeners(){
-    // Solid mazes
-    const canvas1 = document.getElementById("canvas-recDiv");
-    if (canvas1){
-        canvas1.addEventListener("click", () => startMaze<solidField>(canvas1, new RecursiveMaze(20, 20), 250));
-    }
-    const canvas2 = document.getElementById("canvas-primMaze");
-    if (canvas2){
-        canvas2.addEventListener("click", () => startMaze<solidField>(canvas2, new PrimsMaze(20, 20), 55));
-    }
-    const canvas3 = document.getElementById("canvas-simpleBacktrack");
-    if (canvas3){
-        canvas3.addEventListener("click", () => startMaze<solidField>(canvas3, new SimpleBacktrack(20, 20), 55));
-    }
-    // Hollow mazes
-    const canvas4 = document.getElementById("canvas-hollowBacktrack");
-    if (canvas4){
-        canvas4.addEventListener("click", () => startMaze<hollowField>(canvas4, new Backtracker(20, 20), 55));
-    }
-    const canvas5 = document.getElementById("canvas-randomWalk");
-    if (canvas5){
-        canvas5.addEventListener("click", () => startMaze<hollowField>(canvas5, new AldousBroder(12, 12), 55));
-    }
-    const canvas6 = document.getElementById("canvas-tunneler");
-    if (canvas6 != null){
-        canvas6.addEventListener("click", () => startMaze<hollowField>(canvas6, new FrontierTunneler(24, 24), 40));
-    }
-}
-
 // Function to start animating maze: creates new maze object and animates it on canvas click
 function startMaze<F>(
     clickedElement: any, // element is clicked to start function
@@ -64,6 +34,36 @@ function startMaze<F>(
             }
         }
         window.requestAnimationFrame(animate);
+    }
+}
+
+// Adds event listeners to the canvases
+function addCanvasListeners(){
+    // Solid mazes
+    const canvas1 = document.getElementById("canvas-recDiv");
+    if (canvas1){
+        canvas1.addEventListener("click", () => startMaze<solidField>(canvas1, new RecursiveMaze(20, 20), 250));
+    }
+    const canvas2 = document.getElementById("canvas-primMaze");
+    if (canvas2){
+        canvas2.addEventListener("click", () => startMaze<solidField>(canvas2, new PrimsMaze(20, 20), 55));
+    }
+    const canvas3 = document.getElementById("canvas-simpleBacktrack");
+    if (canvas3){
+        canvas3.addEventListener("click", () => startMaze<solidField>(canvas3, new SimpleBacktrack(20, 20), 55));
+    }
+    // Hollow mazes
+    const canvas4 = document.getElementById("canvas-hollowBacktrack");
+    if (canvas4){
+        canvas4.addEventListener("click", () => startMaze<hollowField>(canvas4, new Backtracker(20, 20), 55));
+    }
+    const canvas5 = document.getElementById("canvas-randomWalk");
+    if (canvas5){
+        canvas5.addEventListener("click", () => startMaze<hollowField>(canvas5, new AldousBroder(12, 12), 55));
+    }
+    const canvas6 = document.getElementById("canvas-tunneler");
+    if (canvas6 != null){
+        canvas6.addEventListener("click", () => startMaze<hollowField>(canvas6, new FrontierTunneler(24, 24), 40));
     }
 }
 

@@ -1,9 +1,13 @@
 The Maze Base is a project where I play around with Maze Generation algorithms. 
-A working version of this is also hosted on https://www.planetegem.be/demo/the_maze_base.
+A working version of this is hosted on https://www.planetegem.be/demo/the_maze_base.
 
-Files:
-1) start.ts contains preloader and start function. Start function is tied to onClick eventlistener attached to every canvas container element. Handles animation of maze.
-2) oldfield.ts handles generation of a blank maze with a 'hollow' coordinate system (see comments at start of file for more info)
-3) oldmazes.ts contains classes for first 3 mazes on the page (recursive division, prim's & simple backtracker)
-4) field.ts handles generation of blank maze with internal border system (see comments at start of file)
-5) mazes.ts contains classes for octagon & random walk
+Structure:
+1) start.ts contains the main functions, most importantly:
+    a) a preloader which prepares the canvases where mazes are drawn;
+    b) the buildMaze function, which creates a maze object and animates it on the canvas.
+2) components\cells.ts contains the different types of maze cells used to generate mazes. Each type of cell has a corresponding subfolder (i.e. the HollowCell class is used in 'hollow' components)
+3) each subfolder contains:
+    a) field.ts, which handles the generation of a blank field/set of coordinates
+    b) types subfolder, which contains the actual maze generation algorithms. A maze generation algorithm is always an extension of an appropriate field type
+
+All typescript files are compiled to a single js file
