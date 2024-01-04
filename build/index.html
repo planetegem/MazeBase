@@ -117,6 +117,31 @@
                 </ol>
             </div>
         </segment>
+        <segment id="fake-polar" class="chapter">
+            <h2>7. FAKE POLAR MAZE</h2>
+            <div class="canvas-container running" id="canvas-fakePolar"></div>
+            <h3>click to generate maze</h3>
+            <div class="text">
+                <p>
+                    While we're playing around with shapes, let's try making a circular labyrinth! 
+                    This can be achieved by switching to polar instead of cartesian coordinates:
+                    our x-axis is redefined as an angle on a circle (from 0° to 360°), while the y-axis becomes the distance from the center of the circle.
+                </p>
+                <p>
+                    The labyrinth above isn't perfect yet: we simply took the standard backtracker algorithm and changed the way it's drawn to make it look polar.
+                    In reality, the maze is still generated with cartesian coordinates in mind.
+                    This results in a few problems:
+                    <br>
+                    <br>
+                </p>
+                <ol> 
+                    <li>The further away from the center, the wider cells become. In a proper maze, all cells should be around the same size.</li>
+                    <li>If we were to split the wider cells, we end up with a grid cells can border more than 4 other cells: an impossibility in our current grid system.</li>
+                    <li>We have to leave the center of the circle empty to avoid mashed up, unusable hallways.</li>
+                </ol>
+                <p><br>We'll resolve these issues by rethinking our coordinate system for the next labyrinth!</p>
+            </div>
+        </segment>
     </main>
     <footer>
         <button id="returnbutton" onclick="location.href='https://www.planetegem.be'">

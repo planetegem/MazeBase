@@ -133,7 +133,10 @@ h3 {
     color: #dd6f2af1;
     background-image: url("assets/brain.png");
 }
-
+#fake-polar .canvas-container {
+    color: #0044ff;
+    background-image: url("assets/robot.png");
+}
 
 /* footer */
 footer {

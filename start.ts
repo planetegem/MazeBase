@@ -65,6 +65,10 @@ function addCanvasListeners(){
     if (canvas6 != null){
         canvas6.addEventListener("click", () => startMaze<hollowField>(canvas6, new FrontierTunneler(24, 24), 40));
     }
+    const canvas7 = document.getElementById("canvas-fakePolar");
+    if (canvas7 != null){
+        canvas7.addEventListener("click", () => startMaze<hollowField>(canvas7, new FakePolar(25, 10), 60));
+    }
 }
 
 // Function to draw play button on canvas (on page load)
