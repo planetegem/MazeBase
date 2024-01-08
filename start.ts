@@ -4,7 +4,6 @@ function startMaze<F>(
     maze: FieldInterface<F>, // new maze
     speed: number, // determines number of ticks between each animation step
 ): void {
-    console.log("started");
     if (!clickedElement.classList.contains("running")){
         clickedElement.classList.add("running"); // Blocks double execution
         clickedElement.getElementsByClassName("overlay")[0].classList.remove("clickable");
@@ -68,6 +67,10 @@ function addCanvasListeners(){
     const canvas7 = document.getElementById("canvas-fakePolar");
     if (canvas7 != null){
         canvas7.addEventListener("click", () => startMaze<hollowField>(canvas7, new FakePolar(25, 10), 60));
+    }
+    const canvas8 = document.getElementById("canvas-realPolar");
+    if (canvas8 != null){
+        canvas8.addEventListener("click", () => startMaze<polarField>(canvas8, new PolarBacktracker(8), 60));
     }
 }
 

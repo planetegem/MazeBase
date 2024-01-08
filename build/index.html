@@ -136,10 +136,38 @@
                 </p>
                 <ol> 
                     <li>The further away from the center, the wider cells become. In a proper maze, all cells should be around the same size.</li>
-                    <li>If we were to split the wider cells, we end up with a grid cells can border more than 4 other cells: an impossibility in our current grid system.</li>
+                    <li>If we were to split the wider cells, we end up with a grid where cells can border more than 4 other cells: an impossibility in our current grid system.</li>
                     <li>We have to leave the center of the circle empty to avoid mashed up, unusable hallways.</li>
                 </ol>
                 <p><br>We'll resolve these issues by rethinking our coordinate system for the next labyrinth!</p>
+            </div>
+        </segment>
+        <segment id="real-polar" class="chapter">
+            <h2>8. TRUE POLAR MAZE</h2>
+            <div class="canvas-container running" id="canvas-realPolar"></div>
+            <h3>click to generate maze</h3>
+            <div class="text">
+                <p>
+                    In order to resolve the issues of the previous maze, we have now implemented a new grid and coordinate system 
+                    (or rather: we have done away with a coordinate system)!
+                </p>
+                <p>
+                    While we previously relied on a grid to determine where a cell was and who it neighboured, 
+                    every cell now stores a reference to its neighbours on its own.
+                    This means that cells can now have as many neighbours as they want, with the added advantage of greatly reducing the amount of logic need for the maze generation algorithm.
+                    We also store the shape of the cell for when we have to draw it on the canvas.
+                </p>
+                <p>
+                    Other than that, we added some new logic to the field:
+                    <br>
+                    <br>
+                </p>
+                <ol> 
+                    <li>The central cell is the first one to be created.</li>
+                    <li>Next we create a ring of new cells around the central cells. The amount of cells in this first ring is calculated automatically (to make them about as wide as they are heigh).</li>
+                    <li>We continue adding rings (in function of the radius of the circle). If we detect that cells are becoming too wide, we split them in half.</li>
+                    <li>While adding rings (and creating cells), we link the cells to their neighbours.</li>
+                </ol>
             </div>
         </segment>
     </main>

@@ -130,12 +130,16 @@ h3 {
     background-image: url("assets/cactus.png");
 }
 #random-tunneler .canvas-container {
-    color: #dd6f2af1;
+    color: #dd2a2af1;
     background-image: url("assets/brain.png");
 }
 #fake-polar .canvas-container {
     color: #0044ff;
     background-image: url("assets/robot.png");
+}
+#real-polar .canvas-container {
+    color: #ea7c06;
+    background-image: url("assets/thinker.png");
 }
 
 /* footer */

@@ -3,7 +3,6 @@
 function startMaze(clickedElement, // element is clicked to start function
 maze, // new maze
 speed) {
-    console.log("started");
     if (!clickedElement.classList.contains("running")) {
         clickedElement.classList.add("running"); // Blocks double execution
         clickedElement.getElementsByClassName("overlay")[0].classList.remove("clickable");
@@ -60,6 +59,10 @@ function addCanvasListeners() {
     const canvas7 = document.getElementById("canvas-fakePolar");
     if (canvas7 != null) {
         canvas7.addEventListener("click", () => startMaze(canvas7, new FakePolar(25, 10), 60));
+    }
+    const canvas8 = document.getElementById("canvas-realPolar");
+    if (canvas8 != null) {
+        canvas8.addEventListener("click", () => startMaze(canvas8, new PolarBacktracker(8), 60));
     }
 }
 // Function to draw play button on canvas (on page load)
@@ -177,6 +180,34 @@ class HollowCell {
         this.x = x;
         this.y = y;
         this.mask = mask;
+    }
+}
+// Linked cells: each cell tracks who its neighbours are (for non-cartesian systems)
+class CellLink {
+    constructor(x1, x2, y1, y2) {
+        this.wall = true;
+        this.x1 = x1;
+        this.x2 = x2;
+        this.y1 = y1;
+        this.y2 = y2;
+    }
+}
+class PolarCell {
+    linkNeighbour(cell) {
+        let link = new CellLink(this.x, cell.x, this.y, cell.y);
+        this.links.push(link);
+        cell.links.push(link);
+    }
+    constructor(x, width, y, innerY, outerY) {
+        this.visited = false;
+        this.path = false;
+        this.links = [];
+        this.x = x;
+        this.y = y;
+        this.minX = x * (2 * Math.PI / width);
+        this.maxX = (x + 1) * (2 * Math.PI / width);
+        this.minY = innerY;
+        this.maxY = outerY;
     }
 }
 // Field creation
@@ -1235,6 +1266,221 @@ class FrontierTunneler extends HollowMaze {
                         }
                     }
                     previousBlock = neighbours[Math.floor(Math.random() * neighbours.length)];
+                    return field = start(field, animatedField);
+                }
+                else {
+                    return field;
+                }
+            }
+        }
+        start(this.field, this.animatedField);
+    }
+}
+// Field creation
+class PolarMaze {
+    constructor(radius) {
+        this.field = [];
+        this.animatedField = [];
+        this.linkCollection = [];
+        this.yLength = radius;
+    }
+    // Creation of a polar field
+    generateField() {
+        let centralRadius = 0.9;
+        let height = this.yLength, cellHeight = 1 / (height + centralRadius);
+        let field = [];
+        // Add central cell
+        let newCell = new PolarCell(0, 1, 0, 0, centralRadius);
+        field.push([newCell]);
+        // Determine number of cells in first ring
+        let circumference = 2 * centralRadius * cellHeight * Math.PI;
+        let width = Math.floor(circumference / cellHeight);
+        // Start building the maze ring by ring, inside to outside
+        for (let y = 1; y <= height; y++) {
+            let ring = [];
+            // Check if cells have not become too wide; if so, double the amount of cells per ring
+            let r = y + centralRadius, nextAngle = 2 * Math.PI / width;
+            let distance = Math.sqrt(2 * r * r - 2 * r * r * Math.cos(nextAngle));
+            if (distance > 2) {
+                width *= 2;
+            }
+            // Fill the ring: link every cell to the previous one
+            for (let x = 0; x < width; x++) {
+                let newCell = new PolarCell(x, width, y, y - 1 + centralRadius, y + centralRadius);
+                if (x > 0) {
+                    newCell.linkNeighbour(ring[x - 1]);
+                    if (x == width - 1) {
+                        ring[0].linkNeighbour(newCell);
+                    }
+                }
+                // Link new ring to previous ring
+                if (y === 1) {
+                    newCell.linkNeighbour(field[0][0]);
+                }
+                else if (width > field[field.length - 1].length) {
+                    newCell.linkNeighbour(field[field.length - 1][Math.floor(x / 2)]);
+                }
+                else {
+                    newCell.linkNeighbour(field[field.length - 1][x]);
+                }
+                ring.push(newCell);
+            }
+            field.push(ring);
+        }
+        console.log(field);
+        return field;
+    }
+    // Utility method: save current field to animation history
+    // Because of circular data structure, we need to copy manually
+    saveField(field, target) {
+        let copiedField = JSON.parse(JSON.stringify(field));
+        target.push(copiedField);
+        return target;
+    }
+    // draw function
+    drawMaze(canvas, field, color, image) {
+        let ctx = canvas.getContext("2d"), mazeHeight = field.length - (1 - field[0][0].maxY), radius = canvas.width * 0.49, cellHeight = radius / mazeHeight, wallWidth = 0.05, wallHeight = 0.15, centerX = canvas.width / 2, centerY = canvas.width / 2;
+        if (ctx) {
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(canvas.width / 2, canvas.width / 2, radius, 0, 2 * Math.PI);
+            ctx.clip();
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.globalAlpha = 0.7;
+            ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+            ctx.restore();
+            for (let y = 0; y < field.length; y++) {
+                if (y > 1 && field[y].length > field[y - 1].length) {
+                    wallWidth *= 2;
+                }
+                for (let x = 0; x < field[y].length; x++) {
+                    let currentCell = field[y][x];
+                    if (currentCell.path) {
+                        ctx.globalAlpha = 1;
+                        ctx.fillStyle = "purple";
+                        ctx.beginPath();
+                        ctx.arc(centerX, centerY, currentCell.maxY * cellHeight, currentCell.minX, currentCell.maxX, false);
+                        ctx.arc(canvas.width / 2, canvas.width / 2, currentCell.minY * cellHeight, currentCell.maxX, currentCell.minX, true);
+                        ctx.closePath();
+                        ctx.fill();
+                    }
+                    if (currentCell.visited) {
+                        // draw walls
+                        ctx.globalAlpha = 1;
+                        ctx.fillStyle = color;
+                        for (let link of currentCell.links) {
+                            if (link.wall) {
+                                let neighbour = (currentCell === field[link.y1][link.x1]) ? field[link.y2][link.x2] : field[link.y1][link.x1];
+                                let cellWidth = currentCell.maxX - currentCell.minX;
+                                if (y === 0) {
+                                    cellWidth = field[1][0].maxX - field[1][0].minX;
+                                }
+                                ctx.beginPath();
+                                // top wall
+                                if (neighbour.minY === currentCell.maxY) {
+                                    ctx.arc(centerX, centerY, currentCell.maxY * cellHeight, neighbour.minX - cellWidth * wallWidth, neighbour.maxX + cellWidth * wallWidth, false);
+                                    ctx.arc(centerX, centerY, currentCell.maxY * cellHeight - wallHeight * cellHeight, neighbour.maxX + cellWidth * wallWidth, neighbour.minX - cellWidth * wallWidth, true);
+                                }
+                                // bottom wall
+                                else if (currentCell.minY === neighbour.maxY) {
+                                    ctx.arc(centerX, centerY, currentCell.minY * cellHeight + wallHeight * cellHeight, currentCell.minX - cellWidth * wallWidth, currentCell.maxX + cellWidth * wallWidth, false);
+                                    ctx.arc(centerX, centerY, currentCell.minY * cellHeight, currentCell.maxX + cellWidth * wallWidth, currentCell.minX - cellWidth * wallWidth, true);
+                                }
+                                // left wall
+                                else if (currentCell.minX === neighbour.maxX || (currentCell.minX === 0 && neighbour.maxX === Math.PI * 2)) {
+                                    ctx.arc(centerX, centerY, currentCell.maxY * cellHeight, currentCell.minX, currentCell.minX + cellWidth * wallWidth, false);
+                                    ctx.arc(centerX, centerY, currentCell.minY * cellHeight, currentCell.minX + cellWidth * wallWidth, currentCell.minX, true);
+                                }
+                                // right wall
+                                else if (currentCell.maxX === neighbour.minX || (neighbour.minX === 0 && currentCell.maxX === Math.PI * 2)) {
+                                    ctx.arc(centerX, centerY, currentCell.maxY * cellHeight, currentCell.maxX - cellWidth * wallWidth, currentCell.maxX, false);
+                                    ctx.arc(centerX, centerY, currentCell.minY * cellHeight, currentCell.maxX, currentCell.maxX - cellWidth * wallWidth, true);
+                                }
+                                ctx.closePath();
+                                ctx.fill();
+                            }
+                        }
+                    }
+                    else {
+                    }
+                }
+            }
+            // overlay for unvisited cells
+            for (let y = 0; y < field.length; y++) {
+                for (let x = 0; x < field[y].length; x++) {
+                    let currentCell = field[y][x];
+                    if (!currentCell.visited) {
+                        ctx.globalAlpha = 1;
+                        ctx.fillStyle = "white";
+                        ctx.beginPath();
+                        ctx.arc(centerX, centerY, currentCell.maxY * cellHeight, currentCell.minX, currentCell.maxX, false);
+                        ctx.arc(canvas.width / 2, canvas.width / 2, currentCell.minY * cellHeight, currentCell.maxX, currentCell.minX, true);
+                        ctx.closePath();
+                        ctx.fill();
+                        ctx.globalAlpha = 0.2;
+                        ctx.fillStyle = color;
+                        ctx.beginPath();
+                        ctx.arc(centerX, centerY, currentCell.maxY * cellHeight, currentCell.minX, currentCell.maxX, false);
+                        ctx.arc(canvas.width / 2, canvas.width / 2, currentCell.minY * cellHeight, currentCell.maxX, currentCell.minX, true);
+                        ctx.closePath();
+                        ctx.fill();
+                    }
+                }
+            }
+            // draw outside walls
+            ctx.globalAlpha = 1;
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+            ctx.arc(centerX, centerY, radius - wallWidth * cellHeight, 2 * Math.PI, 0, true);
+            ctx.closePath();
+            ctx.fill();
+        }
+    }
+}
+class PolarBacktracker extends PolarMaze {
+    constructor(radius) {
+        super(radius);
+        this.field = this.generateField();
+        this.animatedField = this.saveField(this.field, this.animatedField);
+        // start recursion
+        this.recursion();
+    }
+    recursion() {
+        // Prep: create path array and choose start position
+        let path = [];
+        let randomY = Math.floor(this.field.length * Math.random()), randomX = Math.floor(this.field[randomY].length * Math.random());
+        path.push(this.field[randomY][randomX]);
+        // Prep: bind saveField method for use during recursion
+        const quickSave = (field, animatedField) => {
+            return this.saveField(field, animatedField);
+        };
+        function start(field, animatedField) {
+            // Select current cell
+            let currentCell = path[path.length - 1];
+            currentCell.visited = true;
+            currentCell.path = true;
+            quickSave(field, animatedField);
+            currentCell.path = false;
+            // Collect unvisited neighbours
+            let possibleLinks = [];
+            for (let link of currentCell.links) {
+                let neighbour = (currentCell === field[link.y1][link.x1]) ? field[link.y2][link.x2] : field[link.y1][link.x1];
+                if (!neighbour.visited) {
+                    possibleLinks.push(link);
+                }
+            }
+            // Select random neighbour to jump to
+            if (possibleLinks.length > 0) {
+                let randomIndex = Math.floor(Math.random() * possibleLinks.length), link = possibleLinks[randomIndex];
+                link.wall = false;
+                let neighbour = (currentCell === field[link.y1][link.x1]) ? field[link.y2][link.x2] : field[link.y1][link.x1];
+                path.push(neighbour);
+                return field = start(field, animatedField);
+            }
+            else {
+                path.splice(path.length - 1, 1);
+                if (path.length > 0) {
                     return field = start(field, animatedField);
                 }
                 else {

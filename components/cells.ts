@@ -47,6 +47,51 @@ class HollowCell {
     }
 }
 
+// Linked cells: each cell tracks who its neighbours are (for non-cartesian systems)
+class CellLink {
+    public wall: boolean = true;
+    public readonly x1: number;
+    public readonly x2: number;
+    public readonly y1: number;
+    public readonly y2: number;
+
+    constructor (x1: number, x2: number, y1: number, y2: number){
+        this.x1 = x1;
+        this.x2 = x2;
+        this.y1 = y1;
+        this.y2 = y2;
+    }
+}
+class PolarCell {
+    public visited: boolean = false;
+    public path: boolean = false;
+    
+    public links: CellLink[] = [];
+
+    public linkNeighbour(cell: PolarCell){
+        let link: CellLink = new CellLink(this.x, cell.x, this.y, cell.y);
+        this.links.push(link);
+        cell.links.push(link);
+    }
+
+    // location variables
+    public readonly x: number;
+    public readonly y: number;
+    public readonly minX: number;
+    public readonly maxX: number;
+    public readonly minY: number;
+    public readonly maxY: number;
+
+    constructor (x:number, width: number, y: number, innerY: number, outerY: number){
+        this.x = x;
+        this.y = y;
+        this.minX = x*(2*Math.PI/width);
+        this.maxX = (x + 1)*(2*Math.PI/width);
+        this.minY = innerY;
+        this.maxY = outerY;
+    }
+}
+
 // Interface used for all maze types
 interface FieldInterface<F> {
     field: F;
