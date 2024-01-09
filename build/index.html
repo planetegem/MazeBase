@@ -170,6 +170,23 @@
                 </ol>
             </div>
         </segment>
+        <segment id="tri-maze" class="chapter">
+            <h2>9. THE TRIANGULARITY</h2>
+            <div class="canvas-container running" id="canvas-triMaze"></div>
+            <h3>click to generate maze</h3>
+            <div class="text">
+                <p>
+                    While we're at it, let's explore what else we can do now that we've moved so much logic from the grid into the individual cells.
+                </p>
+                <p>
+                    This is a maze where every cell has only 3 neighbours.
+                    As before, who these neighbours are and how they relate to each other is all stored locally. Every cell carries the DNA of its neighbours.
+                    Other than that, every cell also remembers its orientiation.
+                    This has allow a grid where every cell is a triangle. We masked the extremeities (top left, top right and bottom cells) for visual reasons.
+                </p>
+                <p>Such a novel shape!</p>
+            </div>
+        </segment>
     </main>
     <footer>
         <button id="returnbutton" onclick="location.href='https://www.planetegem.be'">

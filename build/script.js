@@ -64,6 +64,10 @@ function addCanvasListeners() {
     if (canvas8 != null) {
         canvas8.addEventListener("click", () => startMaze(canvas8, new PolarBacktracker(6), 60));
     }
+    const canvas9 = document.getElementById("canvas-triMaze");
+    if (canvas9 != null) {
+        canvas9.addEventListener("click", () => startMaze(canvas9, new TriBacktracker(11), 75));
+    }
 }
 // Function to draw play button on canvas (on page load)
 function drawOverlay(canvas, color) {
@@ -1498,6 +1502,11 @@ class PolarBacktracker extends PolarMaze {
 }
 // Extend LinkedCell to include some specifics for polar coordinates
 class TriCell extends LinkedCell {
+    constructor(x, y, dir) {
+        super(x, y);
+        this.mask = false;
+        this.dir = dir;
+    }
 }
 // Field creation
 class TriangularMaze {
@@ -1508,7 +1517,36 @@ class TriangularMaze {
     }
     // Creation of a triangular field
     generateField() {
-        let field = [];
+        let field = [], height = this.yLength, width = height * 2 - 1;
+        for (let y = 0; y < height; y++) {
+            let row = [];
+            for (let x = 0; x < width; x++) {
+                let newCell;
+                if (x % 2 === 0) {
+                    newCell = new TriCell(x, y, false);
+                }
+                else {
+                    newCell = new TriCell(x, y, true);
+                }
+                // link to x neighbours
+                if (x > 0) {
+                    newCell.linkNeighbour(row[x - 1]);
+                }
+                row.push(newCell);
+            }
+            width -= 2;
+            // link to y neighbours
+            if (y > 0) {
+                for (let x = 0; x < row.length; x += 2) {
+                    row[x].linkNeighbour(field[y - 1][x + 1]);
+                }
+            }
+            field.push(row);
+        }
+        // mask corners
+        field[0][0].mask = true;
+        field[0][field[0].length - 1].mask = true;
+        field[field.length - 1][0].mask = true;
         return field;
     }
     // Utility method: save current field to animation history
@@ -1521,8 +1559,271 @@ class TriangularMaze {
     // draw function
     drawMaze(canvas, field, color, image) {
         let ctx = canvas.getContext("2d");
+        let margin = canvas.height * 0.05, mazeHeight = canvas.height - 2 * margin, cellHeight = mazeHeight / field.length, topMargin = margin + cellHeight * 0.75, bottomMargin = margin - cellHeight * 0.75, wallWidth = cellHeight * 0.175;
         if (ctx) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(margin + cellHeight, topMargin);
+            ctx.lineTo(canvas.width - margin - cellHeight, topMargin);
+            ctx.lineTo(canvas.width - margin - cellHeight * 0.5, topMargin + cellHeight);
+            ctx.lineTo(canvas.width * 0.5 + cellHeight * 0.5, canvas.height - bottomMargin - cellHeight);
+            ctx.lineTo(canvas.width * 0.5 - cellHeight * 0.5, canvas.height - bottomMargin - cellHeight);
+            ctx.lineTo(margin + cellHeight * 0.5, topMargin + cellHeight);
+            ctx.closePath();
+            ctx.clip();
+            ctx.globalAlpha = 0.8;
+            ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+            ctx.restore();
+            for (let y = 0; y < field.length; y++) {
+                for (let x = 0; x < field[y].length; x++) {
+                    let currentCell = field[y][x];
+                    let correction = cellHeight * 0.5 * y;
+                    if (currentCell.path) {
+                        ctx.beginPath();
+                        if (!currentCell.dir) {
+                            ctx.moveTo(margin + currentCell.x * 0.5 * cellHeight + correction, topMargin + y * cellHeight);
+                            ctx.lineTo(margin + (currentCell.x * 0.5 + 1) * cellHeight + correction, topMargin + y * cellHeight);
+                            ctx.lineTo(margin + (currentCell.x * 0.5 + 0.5) * cellHeight + correction, topMargin + (y + 1) * cellHeight);
+                        }
+                        else {
+                            ctx.moveTo(margin + (currentCell.x * 0.5 + 0.5) * cellHeight + correction, topMargin + y * cellHeight);
+                            ctx.lineTo(margin + (currentCell.x * 0.5 + 1) * cellHeight + correction, topMargin + (y + 1) * cellHeight);
+                            ctx.lineTo(margin + currentCell.x * 0.5 * cellHeight + correction, topMargin + (y + 1) * cellHeight);
+                        }
+                        ctx.closePath();
+                        ctx.globalAlpha = 1;
+                        ctx.fillStyle = "purple";
+                        ctx.fill();
+                    }
+                    if (currentCell.visited) {
+                        // Draw corners
+                        if (!currentCell.dir) {
+                            ctx.beginPath();
+                            ctx.moveTo(margin + currentCell.x * 0.5 * cellHeight + correction, topMargin + y * cellHeight);
+                            ctx.lineTo(margin + currentCell.x * 0.5 * cellHeight + correction + wallWidth * 0.5, topMargin + y * cellHeight);
+                            ctx.lineTo(margin + currentCell.x * 0.5 * cellHeight + correction + wallWidth * 0.25, topMargin + y * cellHeight + wallWidth * 0.5);
+                            ctx.closePath();
+                            ctx.fillStyle = color;
+                            ctx.fill();
+                            ctx.beginPath();
+                            ctx.moveTo(margin + (currentCell.x * 0.5 + 1) * cellHeight + correction, topMargin + y * cellHeight);
+                            ctx.lineTo(margin + (currentCell.x * 0.5 + 1) * cellHeight + correction - wallWidth * 0.5, topMargin + y * cellHeight);
+                            ctx.lineTo(margin + (currentCell.x * 0.5 + 1) * cellHeight + correction - wallWidth * 0.25, topMargin + y * cellHeight + wallWidth * 0.5);
+                            ctx.closePath();
+                            ctx.fillStyle = color;
+                            ctx.fill();
+                            ctx.beginPath();
+                            ctx.moveTo(margin + (currentCell.x * 0.5 + 0.5) * cellHeight - wallWidth * 0.25 + correction, topMargin + (y + 1) * cellHeight - wallWidth * 0.5);
+                            ctx.lineTo(margin + (currentCell.x * 0.5 + 0.5) * cellHeight + wallWidth * 0.25 + correction, topMargin + (y + 1) * cellHeight - wallWidth * 0.5);
+                            ctx.lineTo(margin + (currentCell.x * 0.5 + 0.5) * cellHeight + correction, topMargin + (y + 1) * cellHeight);
+                            ctx.closePath();
+                            ctx.fillStyle = color;
+                            ctx.fill();
+                        }
+                        else {
+                            ctx.beginPath();
+                            ctx.moveTo(margin + (currentCell.x * 0.5 + 0.5) * cellHeight - wallWidth / 4 + correction, topMargin + y * cellHeight + wallWidth / 2);
+                            ctx.lineTo(margin + (currentCell.x * 0.5 + 0.5) * cellHeight + wallWidth / 4 + correction, topMargin + y * cellHeight + wallWidth / 2);
+                            ctx.lineTo(margin + (currentCell.x * 0.5 + 0.5) * cellHeight + correction, topMargin + y * cellHeight);
+                            ctx.closePath();
+                            ctx.fillStyle = color;
+                            ctx.fill();
+                            ctx.beginPath();
+                            ctx.moveTo(margin + currentCell.x * 0.5 * cellHeight + correction, topMargin + (y + 1) * cellHeight);
+                            ctx.lineTo(margin + currentCell.x * 0.5 * cellHeight + correction + wallWidth / 2, topMargin + (y + 1) * cellHeight);
+                            ctx.lineTo(margin + currentCell.x * 0.5 * cellHeight + correction + wallWidth / 4, topMargin + (y + 1) * cellHeight - wallWidth / 2);
+                            ctx.closePath();
+                            ctx.fillStyle = color;
+                            ctx.fill();
+                            ctx.beginPath();
+                            ctx.moveTo(margin + (currentCell.x * 0.5 + 1) * cellHeight + correction, topMargin + (y + 1) * cellHeight);
+                            ctx.lineTo(margin + (currentCell.x * 0.5 + 1) * cellHeight + correction - wallWidth / 2, topMargin + (y + 1) * cellHeight);
+                            ctx.lineTo(margin + (currentCell.x * 0.5 + 1) * cellHeight + correction - wallWidth / 4, topMargin + (y + 1) * cellHeight - wallWidth / 2);
+                            ctx.closePath();
+                            ctx.fillStyle = color;
+                            ctx.fill();
+                        }
+                        for (let link of currentCell.links) {
+                            if (link.wall) {
+                                let neighbour = (currentCell === field[link.y1][link.x1]) ? field[link.y2][link.x2] : field[link.y1][link.x1];
+                                ctx.beginPath();
+                                // top or bottom wall
+                                if (link.y1 != link.y2) {
+                                    if (!currentCell.dir && neighbour.y < currentCell.y) {
+                                        ctx.moveTo(margin + currentCell.x * 0.5 * cellHeight + correction, topMargin + y * cellHeight);
+                                        ctx.lineTo(margin + (currentCell.x * 0.5 + 1) * cellHeight + correction, topMargin + y * cellHeight);
+                                        ctx.lineTo(margin + (currentCell.x * 0.5 + 1) * cellHeight - wallWidth * 0.25 + correction, topMargin + y * cellHeight + wallWidth * 0.5);
+                                        ctx.lineTo(margin + currentCell.x * 0.5 * cellHeight + wallWidth * 0.25 + correction, topMargin + y * cellHeight + wallWidth * 0.5);
+                                    }
+                                    else {
+                                        ctx.moveTo(margin + currentCell.x * 0.5 * cellHeight + correction, topMargin + (y + 1) * cellHeight);
+                                        ctx.lineTo(margin + (currentCell.x * 0.5 + 1) * cellHeight + correction, topMargin + (y + 1) * cellHeight);
+                                        ctx.lineTo(margin + (currentCell.x * 0.5 + 1) * cellHeight - wallWidth * 0.25 + correction, topMargin + (y + 1) * cellHeight - wallWidth * 0.5);
+                                        ctx.lineTo(margin + currentCell.x * 0.5 * cellHeight + wallWidth * 0.25 + correction, topMargin + (y + 1) * cellHeight - wallWidth * 0.5);
+                                    }
+                                }
+                                else {
+                                    // left or right wall
+                                    if (neighbour.x < currentCell.x) {
+                                        if (!currentCell.dir) {
+                                            ctx.moveTo(margin + currentCell.x * 0.5 * cellHeight + correction, topMargin + y * cellHeight);
+                                            ctx.lineTo(margin + (currentCell.x * 0.5 + 0.5) * cellHeight + correction, topMargin + (y + 1) * cellHeight);
+                                            ctx.lineTo(margin + (currentCell.x * 0.5 + 0.5) * cellHeight + wallWidth * 0.25 + correction, topMargin + (y + 1) * cellHeight - wallWidth * 0.5);
+                                            ctx.lineTo(margin + currentCell.x * 0.5 * cellHeight + wallWidth * 0.5 + correction, topMargin + y * cellHeight);
+                                        }
+                                        else {
+                                            ctx.moveTo(margin + (currentCell.x * 0.5 + 0.5) * cellHeight + correction, topMargin + y * cellHeight);
+                                            ctx.lineTo(margin + currentCell.x * 0.5 * cellHeight + correction, topMargin + (y + 1) * cellHeight);
+                                            ctx.lineTo(margin + currentCell.x * 0.5 * cellHeight + wallWidth * 0.5 + correction, topMargin + (y + 1) * cellHeight);
+                                            ctx.lineTo(margin + (currentCell.x * 0.5 + 0.5) * cellHeight + wallWidth * 0.25 + correction, topMargin + y * cellHeight + wallWidth * 0.5);
+                                        }
+                                    }
+                                    else {
+                                        if (!currentCell.dir) {
+                                            ctx.moveTo(margin + (currentCell.x * 0.5 + 1) * cellHeight + correction, topMargin + y * cellHeight);
+                                            ctx.lineTo(margin + (currentCell.x * 0.5 + 0.5) * cellHeight + correction, topMargin + (y + 1) * cellHeight);
+                                            ctx.lineTo(margin + (currentCell.x * 0.5 + 0.5) * cellHeight - wallWidth * 0.25 + correction, topMargin + (y + 1) * cellHeight - wallWidth * 0.5);
+                                            ctx.lineTo(margin + (currentCell.x * 0.5 + 1) * cellHeight - wallWidth * 0.5 + correction, topMargin + y * cellHeight);
+                                        }
+                                        else {
+                                            ctx.moveTo(margin + (currentCell.x * 0.5 + 0.5) * cellHeight + correction, topMargin + y * cellHeight);
+                                            ctx.lineTo(margin + (currentCell.x * 0.5 + 1) * cellHeight + correction, topMargin + (y + 1) * cellHeight);
+                                            ctx.lineTo(margin + (currentCell.x * 0.5 + 1) * cellHeight - wallWidth * 0.5 + correction, topMargin + (y + 1) * cellHeight);
+                                            ctx.lineTo(margin + (currentCell.x * 0.5 + 0.5) * cellHeight - wallWidth * 0.25 + correction, topMargin + y * cellHeight + wallWidth * 0.5);
+                                        }
+                                    }
+                                }
+                                ctx.closePath();
+                                ctx.fillStyle = color;
+                                ctx.fill();
+                            }
+                        }
+                    }
+                }
+            }
+            for (let y = 0; y < field.length; y++) {
+                for (let x = 0; x < field[y].length; x++) {
+                    let currentCell = field[y][x];
+                    let correction = cellHeight * 0.5 * y;
+                    if (!currentCell.visited && !currentCell.dir) {
+                        ctx.globalAlpha = 1;
+                        ctx.fillStyle = "white";
+                        ctx.beginPath();
+                        ctx.moveTo(margin + currentCell.x * 0.5 * cellHeight + correction, topMargin + y * cellHeight);
+                        ctx.lineTo(margin + (currentCell.x * 0.5 + 1) * cellHeight + correction, topMargin + y * cellHeight);
+                        ctx.lineTo(margin + (currentCell.x * 0.5 + 0.5) * cellHeight + correction, topMargin + (y + 1) * cellHeight);
+                        ctx.closePath();
+                        ctx.fill();
+                        if (!currentCell.mask) {
+                            ctx.globalAlpha = 0.2;
+                            ctx.fillStyle = color;
+                            ctx.beginPath();
+                            ctx.moveTo(margin + currentCell.x * 0.5 * cellHeight + correction, topMargin + y * cellHeight);
+                            ctx.lineTo(margin + (currentCell.x * 0.5 + 1) * cellHeight + correction, topMargin + y * cellHeight);
+                            ctx.lineTo(margin + (currentCell.x * 0.5 + 0.5) * cellHeight + correction, topMargin + (y + 1) * cellHeight);
+                            ctx.closePath();
+                            ctx.fill();
+                        }
+                    }
+                    else if (!currentCell.visited && currentCell.dir) {
+                        ctx.globalAlpha = 1;
+                        ctx.fillStyle = "white";
+                        ctx.beginPath();
+                        ctx.moveTo(margin + (currentCell.x * 0.5 + 0.5) * cellHeight + correction, topMargin + y * cellHeight);
+                        ctx.lineTo(margin + (currentCell.x * 0.5 + 1) * cellHeight + correction, topMargin + (y + 1) * cellHeight);
+                        ctx.lineTo(margin + currentCell.x * 0.5 * cellHeight + correction, topMargin + (y + 1) * cellHeight);
+                        ctx.closePath();
+                        ctx.fill();
+                        if (!currentCell.mask) {
+                            ctx.globalAlpha = 0.2;
+                            ctx.fillStyle = color;
+                            ctx.beginPath();
+                            ctx.moveTo(margin + (currentCell.x * 0.5 + 0.5) * cellHeight + correction, topMargin + y * cellHeight);
+                            ctx.lineTo(margin + (currentCell.x * 0.5 + 1) * cellHeight + correction, topMargin + (y + 1) * cellHeight);
+                            ctx.lineTo(margin + currentCell.x * 0.5 * cellHeight + correction, topMargin + (y + 1) * cellHeight);
+                            ctx.closePath();
+                            ctx.fill();
+                        }
+                    }
+                }
+            }
+            // outer walls
+            ctx.globalAlpha = 1;
+            ctx.beginPath();
+            ctx.moveTo(margin + cellHeight, topMargin);
+            ctx.lineTo(canvas.width - margin - cellHeight, topMargin);
+            ctx.lineTo(canvas.width - margin - cellHeight * 0.5, topMargin + cellHeight);
+            ctx.lineTo(canvas.width * 0.5 + cellHeight * 0.5, canvas.height - bottomMargin - cellHeight);
+            ctx.lineTo(canvas.width * 0.5 - cellHeight * 0.5, canvas.height - bottomMargin - cellHeight);
+            ctx.lineTo(margin + cellHeight * 0.5, topMargin + cellHeight);
+            ctx.closePath();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = wallWidth;
+            ctx.stroke();
         }
+    }
+}
+class TriBacktracker extends TriangularMaze {
+    constructor(radius) {
+        super(radius);
+        this.field = this.generateField();
+        this.animatedField = this.saveField(this.field, this.animatedField);
+        // start recursion
+        this.recursion();
+    }
+    recursion() {
+        // Prep: create path array and choose start position
+        let path = [];
+        function getStart(field) {
+            let randomY = Math.floor(field.length * Math.random()), randomX = Math.floor(field[randomY].length * Math.random());
+            if (!field[randomY][randomX].mask) {
+                return field[randomY][randomX];
+            }
+            else {
+                return getStart(field);
+            }
+        }
+        let startCell = getStart(this.field);
+        path.push(startCell);
+        // Prep: bind saveField method for use during recursion
+        const quickSave = (field, animatedField) => {
+            return this.saveField(field, animatedField);
+        };
+        function start(field, animatedField) {
+            // Select current cell
+            let currentCell = path[path.length - 1];
+            currentCell.visited = true;
+            currentCell.path = true;
+            quickSave(field, animatedField);
+            currentCell.path = false;
+            // Collect unvisited neighbours
+            let possibleLinks = [];
+            for (let link of currentCell.links) {
+                let neighbour = (currentCell === field[link.y1][link.x1]) ? field[link.y2][link.x2] : field[link.y1][link.x1];
+                if (!neighbour.visited && !neighbour.mask) {
+                    possibleLinks.push(link);
+                }
+            }
+            // Select random neighbour to jump to
+            if (possibleLinks.length > 0) {
+                let randomIndex = Math.floor(Math.random() * possibleLinks.length), link = possibleLinks[randomIndex];
+                link.wall = false;
+                let neighbour = (currentCell === field[link.y1][link.x1]) ? field[link.y2][link.x2] : field[link.y1][link.x1];
+                path.push(neighbour);
+                return field = start(field, animatedField);
+            }
+            else {
+                path.splice(path.length - 1, 1);
+                if (path.length > 0) {
+                    return field = start(field, animatedField);
+                }
+                else {
+                    return field;
+                }
+            }
+        }
+        start(this.field, this.animatedField);
     }
 }
 class SolidMaze {

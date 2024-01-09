@@ -72,6 +72,10 @@ function addCanvasListeners(){
     if (canvas8 != null){
         canvas8.addEventListener("click", () => startMaze<polarField>(canvas8, new PolarBacktracker(6), 60));
     }
+    const canvas9 = document.getElementById("canvas-triMaze");
+    if (canvas9 != null){
+        canvas9.addEventListener("click", () => startMaze<triField>(canvas9, new TriBacktracker(11), 75));
+    }
 }
 
 // Function to draw play button on canvas (on page load)
