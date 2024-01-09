@@ -1,3 +1,19 @@
+// Extend LinkedCell to include some specifics for polar coordinates
+class PolarCell extends LinkedCell {
+    
+    public readonly minX: number;
+    public readonly maxX: number;
+    public readonly minY: number;
+    public readonly maxY: number;
+
+    constructor (x:number, width: number, y: number, innerY: number, outerY: number){
+        super(x, y);
+        this.minX = x*(2*Math.PI/width);
+        this.maxX = (x + 1)*(2*Math.PI/width);
+        this.minY = innerY;
+        this.maxY = outerY;
+    }
+}
 type polarField = PolarCell[][]; // field = 2D array, first index is x, 2nd index is y
 type polarAnimation = polarField[]; // history of changes to the maze, for animations
 
@@ -7,7 +23,6 @@ class PolarMaze implements FieldInterface<polarField> {
     protected readonly yLength: number;
     public field: polarField = [];
     public animatedField: polarAnimation = [];
-    protected linkCollection: CellLink[] = [];
 
     constructor (radius: number){
         this.yLength = radius;

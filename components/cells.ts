@@ -62,13 +62,13 @@ class CellLink {
         this.y2 = y2;
     }
 }
-class PolarCell {
+class LinkedCell {
     public visited: boolean = false;
     public path: boolean = false;
     
     public links: CellLink[] = [];
 
-    public linkNeighbour(cell: PolarCell){
+    public linkNeighbour(cell: LinkedCell){
         let link: CellLink = new CellLink(this.x, cell.x, this.y, cell.y);
         this.links.push(link);
         cell.links.push(link);
@@ -77,18 +77,10 @@ class PolarCell {
     // location variables
     public readonly x: number;
     public readonly y: number;
-    public readonly minX: number;
-    public readonly maxX: number;
-    public readonly minY: number;
-    public readonly maxY: number;
 
-    constructor (x:number, width: number, y: number, innerY: number, outerY: number){
+    constructor (x: number, y: number) {
         this.x = x;
         this.y = y;
-        this.minX = x*(2*Math.PI/width);
-        this.maxX = (x + 1)*(2*Math.PI/width);
-        this.minY = innerY;
-        this.maxY = outerY;
     }
 }
 

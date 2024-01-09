@@ -70,7 +70,7 @@ function addCanvasListeners(){
     }
     const canvas8 = document.getElementById("canvas-realPolar");
     if (canvas8 != null){
-        canvas8.addEventListener("click", () => startMaze<polarField>(canvas8, new PolarBacktracker(8), 60));
+        canvas8.addEventListener("click", () => startMaze<polarField>(canvas8, new PolarBacktracker(6), 60));
     }
 }
 

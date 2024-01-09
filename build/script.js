@@ -62,7 +62,7 @@ function addCanvasListeners() {
     }
     const canvas8 = document.getElementById("canvas-realPolar");
     if (canvas8 != null) {
-        canvas8.addEventListener("click", () => startMaze(canvas8, new PolarBacktracker(8), 60));
+        canvas8.addEventListener("click", () => startMaze(canvas8, new PolarBacktracker(6), 60));
     }
 }
 // Function to draw play button on canvas (on page load)
@@ -192,22 +192,18 @@ class CellLink {
         this.y2 = y2;
     }
 }
-class PolarCell {
+class LinkedCell {
     linkNeighbour(cell) {
         let link = new CellLink(this.x, cell.x, this.y, cell.y);
         this.links.push(link);
         cell.links.push(link);
     }
-    constructor(x, width, y, innerY, outerY) {
+    constructor(x, y) {
         this.visited = false;
         this.path = false;
         this.links = [];
         this.x = x;
         this.y = y;
-        this.minX = x * (2 * Math.PI / width);
-        this.maxX = (x + 1) * (2 * Math.PI / width);
-        this.minY = innerY;
-        this.maxY = outerY;
     }
 }
 // Field creation
@@ -1276,12 +1272,21 @@ class FrontierTunneler extends HollowMaze {
         start(this.field, this.animatedField);
     }
 }
+// Extend LinkedCell to include some specifics for polar coordinates
+class PolarCell extends LinkedCell {
+    constructor(x, width, y, innerY, outerY) {
+        super(x, y);
+        this.minX = x * (2 * Math.PI / width);
+        this.maxX = (x + 1) * (2 * Math.PI / width);
+        this.minY = innerY;
+        this.maxY = outerY;
+    }
+}
 // Field creation
 class PolarMaze {
     constructor(radius) {
         this.field = [];
         this.animatedField = [];
-        this.linkCollection = [];
         this.yLength = radius;
     }
     // Creation of a polar field
@@ -1489,6 +1494,35 @@ class PolarBacktracker extends PolarMaze {
             }
         }
         start(this.field, this.animatedField);
+    }
+}
+// Extend LinkedCell to include some specifics for polar coordinates
+class TriCell extends LinkedCell {
+}
+// Field creation
+class TriangularMaze {
+    constructor(radius) {
+        this.field = [];
+        this.animatedField = [];
+        this.yLength = radius;
+    }
+    // Creation of a triangular field
+    generateField() {
+        let field = [];
+        return field;
+    }
+    // Utility method: save current field to animation history
+    // Because of circular data structure, we need to copy manually
+    saveField(field, target) {
+        let copiedField = JSON.parse(JSON.stringify(field));
+        target.push(copiedField);
+        return target;
+    }
+    // draw function
+    drawMaze(canvas, field, color, image) {
+        let ctx = canvas.getContext("2d");
+        if (ctx) {
+        }
     }
 }
 class SolidMaze {
