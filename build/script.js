@@ -66,7 +66,7 @@ function addCanvasListeners() {
     }
     const canvas9 = document.getElementById("canvas-triMaze");
     if (canvas9 != null) {
-        canvas9.addEventListener("click", () => startMaze(canvas9, new TriBacktracker(11), 75));
+        canvas9.addEventListener("click", () => startMaze(canvas9, new TriBacktracker(13), 55));
     }
 }
 // Function to draw play button on canvas (on page load)

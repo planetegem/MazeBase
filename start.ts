@@ -74,7 +74,7 @@ function addCanvasListeners(){
     }
     const canvas9 = document.getElementById("canvas-triMaze");
     if (canvas9 != null){
-        canvas9.addEventListener("click", () => startMaze<triField>(canvas9, new TriBacktracker(11), 75));
+        canvas9.addEventListener("click", () => startMaze<triField>(canvas9, new TriBacktracker(13), 55));
     }
 }
 
